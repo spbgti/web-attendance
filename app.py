@@ -19,5 +19,4 @@ def index():
   </body>
 </html>
 '''
-
 app.run(debug = True)
