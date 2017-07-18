@@ -1,22 +1,16 @@
 from flask import Flask
 app = Flask(__name__)
 
-import view1
-import view2
+def hello_world():
+    return 'Hello World!'
+
+from datetime import datetime
+def get_now_datetime():
+    return datetime.now().isoformat
 
 @app.route('/')
-@app.route('/index')
+# @app.route('/index')
 def index():
-    inform = { 'h1': view1.hello_world(), 'h2': view2.dt()}
-    return '''
-<html>
-  <head>
-    <title>Home Page</title>
-  </head>
-  <body>
-    <h1>Text: ''' + inform['h1'] + '''</h1>
-    <h2>Time: ''' + inform['h2'] + '''</h2>
-  </body>
-</html>
-'''
-app.run(debug = True)
+    'Текст:{}\n Время:{}'.format(hello_world(), get_now_datetime())
+
+app.run()
