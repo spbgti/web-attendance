@@ -8,6 +8,6 @@ def hello_world():
 
 @app.route('/get_time')
 def get_now_datetime():
-    return datetime.now().isoformat
+    return datetime.now().isoformat()
 
 app.run()
