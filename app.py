@@ -1,16 +1,13 @@
 from flask import Flask
+from datetime import datetime
 app = Flask(__name__)
 
+@app.route('/hello')
 def hello_world():
     return 'Hello World!'
 
-from datetime import datetime
+@app.route('/get_time')
 def get_now_datetime():
     return datetime.now().isoformat
-
-@app.route('/')
-# @app.route('/index')
-def index():
-    'Текст:{}\n Время:{}'.format(hello_world(), get_now_datetime())
 
 app.run()
