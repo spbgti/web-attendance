@@ -10,8 +10,8 @@ def hello_world():
 
 @app.route('/get_time')
 def get_now_datetime():
-    s = datetime.strftime(datetime.today(), '%d.%m.%Y %H:%M %A')
+    s = datetime.today().strftime('%d.%m.%Y %H:%M %A')
     return s
 
 app.run()
-#Я не понимаю где проблема в url, тк в теории должно работать, а на деле 404 и хоть убейся
+
