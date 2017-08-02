@@ -17,7 +17,7 @@ class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True),
     date = db.Column(db.String)
     pair_num = db.Column(db.Integer)
-    student_key = db.Column(db.Integer, foreign_key=True)
+    student = db.Column(db.Integer)
 
     def __repr__(self):
         return '<Visit: %s, %s, %s>' % (self.student_key, self.date, self.pair_num)
