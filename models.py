@@ -20,7 +20,8 @@ class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True),
     date = db.Column(db.String)  # Datetime
     pair_num = db.Column(db.Integer)
-    student = db.Column(db.Integer, db.ForeignKey('student'))
+
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
     student = db.relationship('Student')
 
     def __init__(self, date, pair_num, student):
