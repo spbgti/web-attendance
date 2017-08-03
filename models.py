@@ -31,3 +31,5 @@ class Visit(db.Model):
 
     def __repr__(self):
         return '<Visit: %s, %s, %s>' % (self.student, self.date, self.pair_num)
+
+db.create_all()
