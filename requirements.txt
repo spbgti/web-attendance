@@ -1,5 +1,3 @@
-database
-automium_web
 sqlalchemy
 requests
 flask
