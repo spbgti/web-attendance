@@ -14,17 +14,18 @@ student = Student(name='Morty', group_number='162')
 db.session.add(student)
 db.session.commit()
 
-Rick = Visit(date='01.09.17', pair_num='2', student=student)
-db.session.add(Rick)
-Rick = Visit(date='05.09.17', pair_num='4', student=student)
-db.session.add(Rick)
+Rick = Student.query.filter_by(name='Rick').first()
+visit = Visit(date='01.09.17', pair_num='2', student=Rick)
+db.session.add(visit)
+visit = Visit(date='05.09.17', pair_num='4', student=Rick)
+db.session.add(visit)
 
-Morty = Visit(date='01.09.17', pair_num='2', student=student)
-db.session.add(Morty)
-Morty = Visit(date='01.09.17', pair_num='3', student=student)
-db.session.add(Morty)
+Morty = Student.query.filter_by(name='Morty').first()
+visit = Visit(date='01.09.17', pair_num='2', student=Morty)
+db.session.add(visit)
+visit = Visit(date='01.09.17', pair_num='3', student=Morty)
+db.session.add(visit)
 db.session.commit()
-
 
 Rick = Student.query.filter_by(name='Rick').first()
 print(list(Visit.query.filter_by(student=Rick).all()))  # Пары, на которых был Рик
