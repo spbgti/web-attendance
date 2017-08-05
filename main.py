@@ -1,5 +1,4 @@
 from datetime import date
-
 from models import db, Student, Visit
 from flask import Flask
 
@@ -32,3 +31,4 @@ db.session.commit()
 Rick = Student.query.filter_by(name='Rick').first()
 print(list(Visit.query.filter_by(student=Rick).all()))  # Пары, на которых был Рик
 print(list(Visit.query.filter_by(date=date(2017, 9, 1)).all()))  # Все посещения за 1 сентября
+
