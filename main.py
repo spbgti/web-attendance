@@ -8,6 +8,7 @@ app.config['SQLALCHEMY_DATABASE_URL'] = 'sqlite:///test.db'
 db.init_app(app)
 app.app_context().push()
 
+
 student = Student(name='Rick', group_number='161')
 db.session.add(student)
 db.commit()
