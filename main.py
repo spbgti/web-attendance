@@ -25,7 +25,6 @@ Morty = Visit(date='01.09.17', pair_num='3', student=student)
 db.session.add(Morty)
 db.session.commit()
 
-
 Rick = Student.query.filter_by(name='Rick').first()
 print(list(Visit.query.filter_by(student=Rick).all()))  # Пары, на которых был Рик
 print(list(Visit.query.filter_by(date='01.09.17').all()))  # Все посещения за 1 сентября
