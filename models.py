@@ -18,7 +18,7 @@ class Student(db.Model):
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime)
+    date = db.Column(db.Date)
     pair_num = db.Column(db.Integer)
 
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
