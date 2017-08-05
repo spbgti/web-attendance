@@ -4,7 +4,7 @@ db = SQLAlchemy()
 
 
 class Student(db.Model):
-    id = db.Column(db.Integer, primary_key=True),
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     group_number = db.Column(db.String)
 
@@ -17,7 +17,7 @@ class Student(db.Model):
 
 
 class Visit(db.Model):
-    id = db.Column(db.Integer, primary_key=True),
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String)  # Datetime
     pair_num = db.Column(db.Integer)
 
@@ -31,5 +31,3 @@ class Visit(db.Model):
 
     def __repr__(self):
         return '<Visit: %s, %s, %s>' % (self.student, self.date, self.pair_num)
-
-db.create_all()

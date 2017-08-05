@@ -1,9 +1,14 @@
 from models import db, Student, Visit
 from flask import Flask
 
-app = Flask()
+app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URL'] = 'sqlite:///test.db'
+
+
+db.init_app(app)
+app.app_context().push()
+
 
 student = Student(name='Rick', group_number='161')
 db.session.add(student)
@@ -28,5 +33,3 @@ db.commit()
 Rick = Student.query.filter(name='Rick').first()
 print(list(Visit.query.filter(student=Rick).all))  # Пары, на которых был Рик
 print(list(Visit.query.filter(date='01.09.17').all))  # Все посещения за 1 сентября
-
-db.init_app(app)
