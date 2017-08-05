@@ -1,3 +1,5 @@
+from datetime import date
+
 from models import db, Student, Visit
 from flask import Flask
 
@@ -15,18 +17,18 @@ db.session.add(student)
 db.session.commit()
 
 Rick = Student.query.filter_by(name='Rick').first()
-visit = Visit(date='01.09.17', pair_num='2', student=Rick)
+visit = Visit(date=date(2017, 9, 1), pair_num='2', student=Rick)
 db.session.add(visit)
-visit = Visit(date='05.09.17', pair_num='4', student=Rick)
+visit = Visit(date=date(2017, 9, 5), pair_num='4', student=Rick)
 db.session.add(visit)
 
 Morty = Student.query.filter_by(name='Morty').first()
-visit = Visit(date='01.09.17', pair_num='2', student=Morty)
+visit = Visit(date=date(2017, 9, 1), pair_num='2', student=Morty)
 db.session.add(visit)
-visit = Visit(date='01.09.17', pair_num='3', student=Morty)
+visit = Visit(date=date(2017, 9, 1), pair_num='3', student=Morty)
 db.session.add(visit)
 db.session.commit()
 
 Rick = Student.query.filter_by(name='Rick').first()
 print(list(Visit.query.filter_by(student=Rick).all()))  # Пары, на которых был Рик
-print(list(Visit.query.filter_by(date='01.09.17').all()))  # Все посещения за 1 сентября
+print(list(Visit.query.filter_by(date=date(2017, 9, 1)).all()))  # Все посещения за 1 сентября
