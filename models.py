@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import UniqueConstraint
 
 db = SQLAlchemy()
 
@@ -24,7 +23,7 @@ class Visit(db.Model):
     pair_num = db.Column(db.Integer)
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
     student = db.relationship('Student')
-    __visit_args__ = (UniqueConstraint('date', 'pair_num', 'student', name='Stud_Date_Pair_UC'))
+    __table_args__ = db.UniqueConstraint('date', 'pair_num', 'student', name='Stud_Date_Pair_UC')
 
     def __init__(self, date, pair_num, student):
         self.date = date
