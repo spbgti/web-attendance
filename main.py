@@ -112,12 +112,15 @@ def get_students(*args):
     else:
         students_all = Student.query.flter_by(group_number=args).all()
     # возвращаем json-результат
-    return jsonify(students_all)
+    return jsonify(students_all), 200
 
 
 @app.route('/students/group/<group_number>', methods=['GET_GROUP'])
 def get_group(group_number):
-    get_students(group_number)
+    if get_students(group_number) is None:
+        return 'Group not found', 404
+    else:
+        get_students(group_number)
 
 if __name__ == '__main__':
     app.run()
