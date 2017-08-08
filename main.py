@@ -99,7 +99,7 @@ def delete_visits(student_id, pair_date, pair_num):
     visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).all()
 
     if visit is None:
-        return 'Data not found', 200 # надо ли добавлять более подробные сведения
+        return 'Data not found', 200
     else:
         visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).delete()
         return 'Data deleted', 200
