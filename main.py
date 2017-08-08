@@ -65,14 +65,14 @@ def post_visits(student_id, pair_date, pair_num):
     except ValueError:  # ловим исключение, и прописываем действие
         return 'Invalid date format, try YYYY.MM.DD', 400
 
-    #проверяем наличие данных о заданной паре
+    # проверяем наличие данных о заданной паре
     visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).all()
 
     if visit is None:
         visit = Visit(date=pair_date, pair_num=pair_num, student=student)
         db.session.add(visit)
         db.session.commit()
-        return 'Add', 200 # надо ли добавлять более подробные сведения
+        return 'Add:', jsonify(student), 200  # надо ли добавлять более подробные сведения
     else:
         return 'Data is in the DataBase', 200
 
@@ -95,14 +95,14 @@ def delete_visits(student_id, pair_date, pair_num):
     except ValueError:  # ловим исключение, и прописываем действие
         return 'Invalid date format, try YYYY.MM.DD', 400
 
-    #проверяем наличие данных о заданной паре
+    # проверяем наличие данных о заданной паре
     visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).all()
 
     if visit is None:
         return 'Data not found', 200
     else:
         visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).delete()
-        return 'Data deleted', 200
+        return 'Data deleted', jsonify(student), 200
 
 
 @app.route('/students', methods=['GET'])
@@ -121,6 +121,7 @@ def get_group(group_number):
         return 'Group not found', 404
     else:
         get_students(group_number)
+
 
 if __name__ == '__main__':
     app.run()
