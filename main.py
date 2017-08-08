@@ -106,22 +106,19 @@ def delete_visits(student_id, pair_date, pair_num):
 
 
 @app.route('/students', methods=['GET'])
-def get_students(*args):
-    if args is None:
-        students_all = Student.query.all()
-    else:
-        students_all = Student.query.flter_by(group_number=args).all()
+def get_students():
+    students_all = Student.query.all()
     # возвращаем json-результат
     return jsonify(students_all), 200
 
 
 @app.route('/students/group/<group_number>', methods=['GET_GROUP'])
 def get_group(group_number):
-    if get_students(group_number) is None:
+    students = Student.query.filter_by(group_number=group_number).all()
+    if students is None:
         return 'Group not found', 404
     else:
-        get_students(group_number)
-
+        return jsonify(students), 200
 
 if __name__ == '__main__':
     app.run()
