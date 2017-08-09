@@ -47,7 +47,7 @@ def get_visits(student_id, pair_date):
 
 
 # исправить эндпоинт
-@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>/add', methods=['POST'])
+@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['POST'])
 def post_visits(student_id, pair_date, pair_num):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
@@ -66,7 +66,8 @@ def post_visits(student_id, pair_date, pair_num):
         return 'Invalid date format, try YYYY.MM.DD', 400
 
     # проверяем наличие данных о заданной паре
-    visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).all()
+    visit = Visit.query.filter_by(student=student, date=pair_date,
+                                  pair_num=pair_num).first()
 
     if visit is None:
         visit = Visit(date=pair_date, pair_num=pair_num, student=student)
@@ -76,8 +77,7 @@ def post_visits(student_id, pair_date, pair_num):
             'student': student_id,
             'date': pair_date.strftime('%Y.%m.%d'),
             'pair': pair_num
-        }),
-            201)
+        }), 201)
     else:
         return 'Data is in the DataBase', 200
 
@@ -101,18 +101,15 @@ def delete_visits(student_id, pair_date, pair_num):
         return 'Invalid date format, try YYYY.MM.DD', 400
 
     # проверяем наличие данных о заданной паре
-    visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).all()
+    visit = Visit.query.filter_by(student=student, date=pair_date,
+                                  pair_num=pair_num).first()
 
     if visit is None:
         return 'Data not found', 200
     else:
-        visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).delete()
-        return app.make_response(jsonify(stud={
-            'student': student_id,
-            'date': pair_date.strftime('%Y.%m.%d'),
-            'pair': pair_num
-        }),
-            200)  # 404?
+        db.session.delete(visit)
+        db.session.commit()
+        return "visit is deleted", 200
 
 
 # не знаю чего с этим делать
@@ -124,7 +121,7 @@ def get_students():
     for student in students_all:
         students_list[student.id] = student.name
 
-    return app.make_response(jsonify(student={'group': 'All', 'name': students_list}), 200)
+    return make_response(jsonify(student={'group': 'All', 'name': students_list}), 200)
 
 
 @app.route('/students/group/<group_number>', methods=['GET'])
@@ -137,7 +134,7 @@ def get_group(group_number):
         for student in students:
             students_list[student.id] = student.name
 
-        return app.make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
+        return make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
 
 
 if __name__ == '__main__':
