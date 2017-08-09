@@ -72,7 +72,13 @@ def post_visits(student_id, pair_date, pair_num):
         visit = Visit(date=pair_date, pair_num=pair_num, student=student)
         db.session.add(visit)
         db.session.commit()
-        return 'Add:', jsonify(student), 200  # надо ли добавлять более подробные сведения
+        return app.make_response('Add',
+                                 jsonify(stud={
+                                     'student': student_id,
+                                     'date': pair_date.strftime('%Y.%m.%d'),
+                                     'pair': pair_num
+                                 }),
+                                 200)
     else:
         return 'Data is in the DataBase', 200
 
@@ -102,14 +108,25 @@ def delete_visits(student_id, pair_date, pair_num):
         return 'Data not found', 200
     else:
         visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).delete()
-        return 'Data deleted', jsonify(student), 200
+        return app.make_response('Data deleted',
+                                 jsonify(stud={
+                                     'student': student_id,
+                                     'date': pair_date.strftime('%Y.%m.%d'),
+                                     'pair': pair_num
+                                 }),
+                                 200)
 
-
+# не знаю чего с этим делать
 @app.route('/students', methods=['GET'])
 def get_students():
     students_all = Student.query.all()
     # возвращаем json-результат
-    return jsonify(students_all), 200
+    students_list = {}
+    for student in students_all:
+        students_list[student.id] = student.name
+
+    return app.make_response(jsonify(student={'id': students_list.get(students_list[student.id]),
+                                              'name': students_list[student.id]}), 200)
 
 
 @app.route('/students/group/<group_number>', methods=['GET_GROUP'])
@@ -118,7 +135,12 @@ def get_group(group_number):
     if students is None:
         return 'Group not found', 404
     else:
-        return jsonify(students), 200
+        students_list={}
+        for student in students:
+            students_list[student.id] = student.name
+
+        return app.make_response(jsonify(student={'id': students_list.get(students_list[student.id]),
+                                                  'name': students_list[student.id]}), 200)
 
 if __name__ == '__main__':
     app.run()
