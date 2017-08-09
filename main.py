@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from models import db, Student, Visit
-from flask import Flask, jsonify, json
+from flask import Flask, jsonify, make_response
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -72,8 +72,7 @@ def post_visits(student_id, pair_date, pair_num):
         visit = Visit(date=pair_date, pair_num=pair_num, student=student)
         db.session.add(visit)
         db.session.commit()
-        return app.make_response('Add',
-                                 jsonify(stud={
+        return make_response(jsonify(stud={
                                      'student': student_id,
                                      'date': pair_date.strftime('%Y.%m.%d'),
                                      'pair': pair_num
@@ -108,8 +107,7 @@ def delete_visits(student_id, pair_date, pair_num):
         return 'Data not found', 200
     else:
         visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).delete()
-        return app.make_response('Data deleted',
-                                 jsonify(stud={
+        return app.make_response(jsonify(stud={
                                      'student': student_id,
                                      'date': pair_date.strftime('%Y.%m.%d'),
                                      'pair': pair_num
@@ -126,8 +124,7 @@ def get_students():
     for student in students_all:
         students_list[student.id] = student.name
 
-    return app.make_response(jsonify(student={'id': students_list.get(students_list[student.id]),
-                                              'name': students_list[student.id]}), 200)
+    return app.make_response(jsonify(student={'group': 'All', 'name': students_list}), 200)
 
 
 @app.route('/students/group/<group_number>', methods=['GET'])
@@ -140,8 +137,7 @@ def get_group(group_number):
         for student in students:
             students_list[student.id] = student.name
 
-        return app.make_response(jsonify(student={'id': students_list.get(students_list[student.id]),
-                                                  'name': students_list[student.id]}), 200)
+        return app.make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
 
 if __name__ == '__main__':
     app.run()
