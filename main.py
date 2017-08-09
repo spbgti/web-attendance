@@ -78,7 +78,7 @@ def post_visits(student_id, pair_date, pair_num):
                                      'date': pair_date.strftime('%Y.%m.%d'),
                                      'pair': pair_num
                                  }),
-                                 200)
+                                 201)
     else:
         return 'Data is in the DataBase', 200
 
@@ -114,7 +114,8 @@ def delete_visits(student_id, pair_date, pair_num):
                                      'date': pair_date.strftime('%Y.%m.%d'),
                                      'pair': pair_num
                                  }),
-                                 200)
+                                 200) # 404?
+
 
 # не знаю чего с этим делать
 @app.route('/students', methods=['GET'])
@@ -129,7 +130,7 @@ def get_students():
                                               'name': students_list[student.id]}), 200)
 
 
-@app.route('/students/group/<group_number>', methods=['GET_GROUP'])
+@app.route('/students/group/<group_number>', methods=['GET'])
 def get_group(group_number):
     students = Student.query.filter_by(group_number=group_number).all()
     if students is None:
