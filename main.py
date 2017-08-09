@@ -73,11 +73,11 @@ def post_visits(student_id, pair_date, pair_num):
         db.session.add(visit)
         db.session.commit()
         return make_response(jsonify(stud={
-                                     'student': student_id,
-                                     'date': pair_date.strftime('%Y.%m.%d'),
-                                     'pair': pair_num
-                                 }),
-                                 201)
+            'student': student_id,
+            'date': pair_date.strftime('%Y.%m.%d'),
+            'pair': pair_num
+        }),
+            201)
     else:
         return 'Data is in the DataBase', 200
 
@@ -108,11 +108,11 @@ def delete_visits(student_id, pair_date, pair_num):
     else:
         visit = Visit.query.filter_by(student=student, date=pair_date, pair_num=pair_num).delete()
         return app.make_response(jsonify(stud={
-                                     'student': student_id,
-                                     'date': pair_date.strftime('%Y.%m.%d'),
-                                     'pair': pair_num
-                                 }),
-                                 200) # 404?
+            'student': student_id,
+            'date': pair_date.strftime('%Y.%m.%d'),
+            'pair': pair_num
+        }),
+            200)  # 404?
 
 
 # не знаю чего с этим делать
@@ -133,11 +133,12 @@ def get_group(group_number):
     if students is None:
         return 'Group not found', 404
     else:
-        students_list={}
+        students_list = {}
         for student in students:
             students_list[student.id] = student.name
 
         return app.make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
+
 
 if __name__ == '__main__':
     app.run()
