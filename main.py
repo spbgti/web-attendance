@@ -9,7 +9,7 @@ db.init_app(app)
 
 
 # работает и есть комментарии
-@app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
+@app.route('/visits/student/<int:student_id>/date/<pair_date>/get', methods=['GET'])
 def get_visits(student_id, pair_date):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
@@ -48,7 +48,7 @@ def get_visits(student_id, pair_date):
 
 
 # должен работать и есть комментарии
-@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['POST'])
+@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>/post', methods=['POST'])
 def post_visits(student_id, pair_date, pair_num):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
@@ -84,7 +84,7 @@ def post_visits(student_id, pair_date, pair_num):
 
 
 # работает и есть комментарии
-@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['DELETE'])
+@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>/delete', methods=['DELETE'])
 def delete_visits(student_id, pair_date, pair_num):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
@@ -115,7 +115,7 @@ def delete_visits(student_id, pair_date, pair_num):
 
 
 # работает и есть комментарии
-@app.route('/students', methods=['GET'])
+@app.route('/students/get', methods=['GET'])
 def get_students():
     # достаем всех студетов
     students_all = Student.query.all()
@@ -128,22 +128,47 @@ def get_students():
 
 
 # работает и есть комментарии
-@app.route('/students/group/<group_number>', methods=['GET'])
-def get_group(group_number):
-    # достаем всех студентов из заданной группы
-    students = Student.query.filter_by(group_number=group_number).all()
-    if students is None: # если нет ни одного студента в данной группе
-        return 'Group not found', 404 # то возвращаем ошибку о том, что группа не найдена
-    else: # иначе создаем пустой словарь и заполняем имеющмися данными
-        students = {}
-        for student in students:
-            students[student.id] = student.name
-        # возвращаем json-результат
-        return make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
+@app.route('/students/<int:student_id>/get', methods=['GET'])
+def get_student_by_id(student_id):
+    # вытаскиваем студента по id
+    student = Student.query.get(student_id)
+
+    if student is None:  # если студент не найден - вернуть ошибку.
+        # Model.query.get возвращает None, если в базе нет записи с таким
+        # примари-кей.
+        # http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.get
+        return 'Student not found', 404
+    else:  # иначе возвращаем информацию о студенте
+        return make_response(jsonify(student={
+            'id': student.id,
+            'group_number': student.group_number,
+            'name': student.name
+        }), 200)
 
 
-# добавь удаление студента и комментарии
-@app.route('/delete/student/<int:student_id>', methods=['DELETE'])
+# не работает и есть комментарии
+@app.route('/students/<int:student_id>/put', methods=['PUT'])
+def put_student(student_id, student_name, student_group):
+    # вытаскиваем студента по id
+    student = Student.query.get(student_id)
+    if student is None:  # если студент не найден, то ошибка
+        return 'Student not found', 404
+    else:  # иначе вносим изменения в базу
+        db.session.delete(student)  # удаляем старые данные
+        # записываем новые данные, ругается на id=student_id, удаляю тоже не работает
+        student = Student(name=student_name, group_number=student_group)
+        db.session.add(student)
+        db.session.commit()
+        # возвращаем json
+        return make_response(jsonify(student={
+            'id': student.id,
+            'group_number': student.group_number,
+            'name': student.name
+        }), 200)
+
+
+# работает и есть комментарии
+@app.route('/delete/student/<int:student_id>/delete', methods=['DELETE'])
 def delete_student(student_id):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
@@ -153,10 +178,25 @@ def delete_student(student_id):
         # примари-кей.
         # http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.get
         return 'Student not found', 404
-    else: # иначе удаляем студента
+    else:  # иначе удаляем студента
         db.session.delete(student)
         db.session.commit()
         return "Student is deleted", 200
+
+
+# работает и есть комментарии
+@app.route('/students/group/<group_number>/get', methods=['GET'])
+def get_group(group_number):
+    # достаем всех студентов из заданной группы
+    students = Student.query.filter_by(group_number=group_number).all()
+    if students is None:  # если нет ни одного студента в данной группе
+        return 'Group not found', 404  # то возвращаем ошибку о том, что группа не найдена
+    else:  # иначе создаем пустой словарь и заполняем имеющмися данными
+        students = {}
+        for student in students:
+            students[student.id] = student.name
+        # возвращаем json-результат
+        return make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
 
 
 if __name__ == '__main__':
