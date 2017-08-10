@@ -8,6 +8,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db.init_app(app)
 
 
+# работает и есть комментарии
 @app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
 def get_visits(student_id, pair_date):
     # вытаскиваем студента по id
@@ -39,14 +40,14 @@ def get_visits(student_id, pair_date):
     # было), то цикл не выполнится ни разу и все будут False (что логично)
 
     # возвращаем json-результат как договарились в #3
-    return jsonify(visits={
+    return make_response(jsonify(visits={
         'student': student_id,
         'date': pair_date.strftime('%Y.%m.%d'),
         'pairs': pair_visits
-    })
+    }), 200)
 
 
-# исправить эндпоинт
+# должен работать и есть комментарии
 @app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['POST'])
 def post_visits(student_id, pair_date, pair_num):
     # вытаскиваем студента по id
@@ -69,7 +70,7 @@ def post_visits(student_id, pair_date, pair_num):
     visit = Visit.query.filter_by(student=student, date=pair_date,
                                   pair_num=pair_num).first()
 
-    if visit is None:
+    if visit is None:  # если посещение не найдено, то вносим его в базу
         visit = Visit(date=pair_date, pair_num=pair_num, student=student)
         db.session.add(visit)
         db.session.commit()
@@ -78,10 +79,11 @@ def post_visits(student_id, pair_date, pair_num):
             'date': pair_date.strftime('%Y.%m.%d'),
             'pair': pair_num
         }), 201)
-    else:
+    else:  # иначе сообщаем о том, что данные уже существуют
         return 'Data is in the DataBase', 200
 
 
+# работает и есть комментарии
 @app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['DELETE'])
 def delete_visits(student_id, pair_date, pair_num):
     # вытаскиваем студента по id
@@ -104,37 +106,57 @@ def delete_visits(student_id, pair_date, pair_num):
     visit = Visit.query.filter_by(student=student, date=pair_date,
                                   pair_num=pair_num).first()
 
-    if visit is None:
+    if visit is None:  # если данные не найдены, сообщаем об этом
         return 'Data not found', 200
-    else:
+    else:  # иаче удаляем
         db.session.delete(visit)
         db.session.commit()
-        return "visit is deleted", 200
+        return "Visit is deleted", 200  # сообщаем об удалении
 
 
-# не знаю чего с этим делать
+# работает и есть комментарии
 @app.route('/students', methods=['GET'])
 def get_students():
+    # достаем всех студетов
     students_all = Student.query.all()
-    # возвращаем json-результат
-    students_list = {}
+    # создаем пустой словарь
+    students = {}
     for student in students_all:
-        students_list[student.id] = student.name
+        students[student.id] = student.name  # запоняем имеющимися у нас данными
+    # возвращаем json-результат
+    return make_response(jsonify(student={'group': 'All', 'name': students}), 200)
 
-    return make_response(jsonify(student={'group': 'All', 'name': students_list}), 200)
 
-
+# работает и есть комментарии
 @app.route('/students/group/<group_number>', methods=['GET'])
 def get_group(group_number):
+    # достаем всех студентов из заданной группы
     students = Student.query.filter_by(group_number=group_number).all()
-    if students is None:
-        return 'Group not found', 404
-    else:
-        students_list = {}
+    if students is None: # если нет ни одного студента в данной группе
+        return 'Group not found', 404 # то возвращаем ошибку о том, что группа не найдена
+    else: # иначе создаем пустой словарь и заполняем имеющмися данными
+        students = {}
         for student in students:
-            students_list[student.id] = student.name
-
+            students[student.id] = student.name
+        # возвращаем json-результат
         return make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
+
+
+# добавь удаление студента и комментарии
+@app.route('/delete/student/<int:student_id>', methods=['DELETE'])
+def delete_student(student_id):
+    # вытаскиваем студента по id
+    student = Student.query.get(student_id)
+
+    if student is None:  # если студент не найден - вернуть ошибку.
+        # Model.query.get возвращает None, если в базе нет записи с таким
+        # примари-кей.
+        # http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.get
+        return 'Student not found', 404
+    else: # иначе удаляем студента
+        db.session.delete(student)
+        db.session.commit()
+        return "Student is deleted", 200
 
 
 if __name__ == '__main__':
