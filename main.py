@@ -1,14 +1,129 @@
 from datetime import date, datetime
 from models import db, Student, Visit
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
+
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
 db.init_app(app)
 
+@app.route('/visits/<int:visit_id>', methods=['GET'])
+def get_visit_by_id(visit_id):
+    visit = Visit.query.get(visit_id)
 
-# работает и есть комментарии
+    if visit is None:
+        return make_response(jsonify(status="Visit not found"), 404)
+    # на выходе {"status": "Visit not found"}
+
+    return make_response(jsonify(
+        status='OK',
+        visit=visit.to_dict()
+    ), 200)
+    # на выходе {"status": "ok", "visit": {"id": 1, "date": "2017.01.01",
+    # "pair_num": 1, "student_id": 10}}
+
+
+@app.route('/visits', methods=['GET'])
+def get_all_visits():
+    visits = Visit.query.all()  # достаем все
+
+    return make_response(jsonify(
+        status='OK',
+        visits=[visit.to_dict() for visit in visits]  # делаем список словарей
+    ), 200)
+    # на выходе что-то вроде
+    # {"status": "OK", "visits": [{"id: 1, "pair_num": 1, ...}, ...]}
+
+
+@app.route('/visits', methods=['POST'])
+def create_visit():
+    # request - глобальный контекст-зависимый объект запроса клиента
+    # в момент прихода запроса - туда записываются все данные запроса (ip,
+    # url, данные, тип запроса, ...)
+    # с ним можно работать во вьюхе никак явно не передавая
+
+    # http://flask.pocoo.org/docs/0.12/api/#flask.Request.get_json
+    # проверяет что в заголовках запроса установлен жсон, если нет - None
+    # пытается спарсить жсон в словарь, если не вышло - падает с исключением
+    # silent=True заменяет исключение на возврат None
+    visit_data = request.get_json(silent=True)
+
+    if visit_data is None:
+        return make_response(
+            jsonify(status="Invalid json"),
+            400
+        )
+
+    # для создания посещения нам нужен: студент, дата, номер пары, пробуем
+    # извлечь, а также валидируем всё
+
+    try:
+        student_id = visit_data['student_id']
+        pair_date = visit_data['date']
+        pair_num = visit_data['pair_num']
+    except KeyError:
+        return make_response(
+            jsonify(status="Requires student_id, date and pair_num values"),
+            400
+        )
+
+    # студент
+    if not isinstance(student_id, int):  # проверяем что student_id - int
+        return make_response(
+            jsonify(status="student_id must be int value"),
+            400
+        )
+
+    student = Student.query.get(student_id)
+    if student is None:
+        return make_response(
+            jsonify(status="Student not found"),
+            400
+        )
+
+    # дата
+    try:
+        pair_date = datetime.strptime(pair_date, '%Y.%m.%d').date()
+    except ValueError:
+        return make_response(
+            jsonify(status="Invalid date format, try YYYY.MM.DD"),
+            400
+        )
+
+    # номер пары
+    if not isinstance(pair_num, int):
+        return make_response(
+            jsonify(status="pair_num must be int value"),
+            400
+        )
+
+    if not 1 <= pair_num <= 4:
+        return make_response(
+            jsonify(status="pair_num must be from 1 to 4"),
+            400
+        )
+
+    visit = Visit(date=pair_date, pair_num=pair_num, student=student)
+    try:
+        db.session.add(visit)
+        db.session.commit()
+        status_code = 201
+        status = "Created"
+    except IntegrityError:
+        db.session.rollback()
+        visit = Visit.query.filter_by(date=pair_date, pair_num=pair_num,
+                                      student=student).first()
+        status_code = 200
+        status = "Found"
+
+    return make_response(
+        jsonify(status=status, visit=visit.to_dict()),
+        status_code
+    )
+
+
 @app.route('/visits/student/<int:student_id>/date/<pair_date>/get', methods=['GET'])
 def get_visits(student_id, pair_date):
     # вытаскиваем студента по id

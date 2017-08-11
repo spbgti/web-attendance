@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -32,3 +34,11 @@ class Visit(db.Model):
 
     def __repr__(self):
         return '<Visit: %s, %s, %s>' % (self.student, self.date, self.pair_num)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'date': self.date.strftime('%Y.%m.%d'),
+            'pair_num': self.pair_num,
+            'student_id': self.student_id
+        }
