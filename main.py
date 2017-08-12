@@ -299,16 +299,16 @@ def delete_visit(visit_id):
     visit = Visit.query.get(visit_id)
 
     if visit is None:
-        return make_response(jsonify(
-            status='Data not found'),
-            404)
-
+        status = 'Data not found'
+        status_code = 404
     else:  # иначе удаляем студента
         db.session.delete(visit)
         db.session.commit()
-    return make_response(jsonify(
-        status='Data deleted'
-        ), 200)
+        status = "Visit is deleted"
+        status_code = 200
+
+    return make_response(
+        jsonify(status=status), status_code)
 
 
 # ---------------STUDENT-------------
@@ -477,6 +477,8 @@ def delete_student(student_id):
         status = 'Student not found'
         status_code = 404
     else:
+        db.session.delete(student)
+        db.session.commit()
         status = "Student is deleted"
         status_code = 200
 
