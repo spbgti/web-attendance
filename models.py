@@ -18,6 +18,13 @@ class Student(db.Model):
     def __repr__(self):
         return '<Student: %s, %s>' % (self.name, self.group_number)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'group_number': self.group_number
+        }
+
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)

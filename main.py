@@ -9,6 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
 db.init_app(app)
 
+
 # ---------------VISIT---------------
 
 # ---GET---
@@ -43,7 +44,7 @@ def get_all_visits():
 
 
 @app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
-def get_visits_date(student_id, pair_date):
+def get_visits_day(student_id, pair_date):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
 
@@ -69,11 +70,13 @@ def get_visits_date(student_id, pair_date):
         pair_visits[visit.pair_num] = True  # если он был на этой паре,
         # то ставим True
 
-    return make_response(jsonify(visits={
-        'student': student_id,
-        'date': pair_date.strftime('%Y.%m.%d'),
-        'pairs': pair_visits
-    }), 200)
+    return make_response(jsonify(
+        status='OK',
+        visits={
+            'student': student_id,
+            'date': pair_date.strftime('%Y.%m.%d'),
+            'pairs': pair_visits
+        }), 200)
 
 
 @app.route('/visits/student/<int:student_id>/week/<week_start>', methods=['GET'])
@@ -110,10 +113,13 @@ def get_visits_week(student_id, week_start):
         visits_by_week[str(week_start)] = pair_visits
         week_start += timedelta(days=1)
 
-    return make_response(jsonify(visits={
-        'student': student_id,
-        'pairs': visits_by_week
-    }), 200)
+    return make_response(jsonify(
+        status='OK',
+        visits={
+            'student': student_id,
+            'pairs': visits_by_week
+        }), 200)
+
 
 # ---POST---
 
@@ -193,11 +199,8 @@ def create_visit():
         status_code = 201
         status = "Created"
     except IntegrityError:
-        db.session.rollback()
-        visit = Visit.query.filter_by(date=pair_date, pair_num=pair_num,
-                                      student=student).first()
-        status_code = 200
-        status = "Found"
+        return make_response(jsonify(
+            status='Found the same visit'), 400)
 
     return make_response(
         jsonify(status=status, visit=visit.to_dict()),
@@ -205,45 +208,11 @@ def create_visit():
     )
 
 
-@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['POST'])
-def post_visits(student_id, pair_date, pair_num):
-    # вытаскиваем студента по id
-    student = Student.query.get(student_id)
-
-    if student is None:  # если студент не найден - вернуть ошибку.
-        # Model.query.get возвращает None, если в базе нет записи с таким
-        # примари-кей.
-        # http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.get
-        return 'Student not found', 404
-
-    try:  # если дату не получилось спарсить, то strptime выкинет исключение
-        # https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime
-        pair_date = datetime.strptime(pair_date, '%Y.%m.%d').date()
-        # не забываем перевести datetime в date c помощью .date()
-    except ValueError:  # ловим исключение, и прописываем действие
-        return 'Invalid date format, try YYYY.MM.DD', 400
-
-    # проверяем наличие данных о заданной паре
-    visit = Visit.query.filter_by(student=student, date=pair_date,
-                                  pair_num=pair_num).first()
-
-    if visit is None:  # если посещение не найдено, то вносим его в базу
-        visit = Visit(date=pair_date, pair_num=pair_num, student=student)
-        db.session.add(visit)
-        db.session.commit()
-        return make_response(jsonify(stud={
-            'student': student_id,
-            'date': pair_date.strftime('%Y.%m.%d'),
-            'pair': pair_num
-        }), 201)
-    else:  # иначе сообщаем о том, что данные уже существуют
-        return 'Data is in the DataBase', 200
-
 # ---PUT---
 
 
 @app.route('/visits/<int:visit_id>', methods=['PUT'])
-def edit_visits(visit_id):
+def edit_visit(visit_id):
     visit = Visit.query.get(visit_id)
 
     if visit is None:
@@ -309,48 +278,20 @@ def edit_visits(visit_id):
         visit.date = pair_date
         visit.pair_num = pair_num
         db.session.commit()
-        status_code = 201
+        status_code = 200
         status = "Edited"
     except IntegrityError:
-        db.session.rollback()
-        visit = Visit.query.filter_by(date=pair_date, pair_num=pair_num,
-                                      student=student).first()
-        status_code = 200
-        status = "Found"
+        return make_response(jsonify(
+            status='Found yhe same visit'),
+            400)
 
     return make_response(
         jsonify(status=status, visit=visit.to_dict()),
         status_code
     )
 
+
 # ---DELETE---
-
-
-@app.route('/visits/student/<int:student_id>/date/<pair_date>/pair/<int:pair_num>', methods=['DELETE'])
-def delete_visit_pair(student_id, pair_date, pair_num):
-    # вытаскиваем студента по id
-    student = Student.query.get(student_id)
-
-    if student is None:
-        return 'Student not found', 404
-
-    try:  # если дату не получилось спарсить, то strptime выкинет исключение
-        # https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime
-        pair_date = datetime.strptime(pair_date, '%Y.%m.%d').date()
-        # не забываем перевести datetime в date c помощью .date()
-    except ValueError:  # ловим исключение, и прописываем действие
-        return 'Invalid date format, try YYYY.MM.DD', 400
-
-    # проверяем наличие данных о заданной паре
-    visit = Visit.query.filter_by(student=student, date=pair_date,
-                                  pair_num=pair_num).first()
-
-    if visit is None:  # если данные не найдены, сообщаем об этом
-        return 'Data not found', 200
-    else:  # иаче удаляем
-        db.session.delete(visit)
-        db.session.commit()
-        return "Data is deleted", 200  # сообщаем об удалении
 
 
 @app.route('/visits/<int:visit_id>', methods=['DELETE'])
@@ -358,11 +299,16 @@ def delete_visit(visit_id):
     visit = Visit.query.get(visit_id)
 
     if visit is None:
-       return 'Data not found', 404
+        return make_response(jsonify(
+            status='Data not found'),
+            404)
+
     else:  # иначе удаляем студента
         db.session.delete(visit)
         db.session.commit()
-        return "Data is deleted", 200
+    return make_response(jsonify(
+        status='Data deleted'
+        ), 200)
 
 
 # ---------------STUDENT-------------
@@ -371,15 +317,14 @@ def delete_visit(visit_id):
 
 
 @app.route('/students', methods=['GET'])
-def get_students():
+def get_all_students():
     # достаем всех студетов
     students_all = Student.query.all()
-    # создаем пустой словарь
-    students = {}
-    for student in students_all:
-        students[student.id] = student.name  # запоняем имеющимися у нас данными
-    # возвращаем json-результат
-    return make_response(jsonify(student={'group': 'All', 'name': students}), 200)
+
+    return make_response(jsonify(
+        status='OK',
+        students=[student.to_dict() for student in students_all]  # делаем список словарей
+    ), 200)
 
 
 @app.route('/students/<int:student_id>', methods=['GET'])
@@ -387,31 +332,30 @@ def get_student_by_id(student_id):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
 
-    if student is None:  # если студент не найден - вернуть ошибку.
-        # Model.query.get возвращает None, если в базе нет записи с таким
-        # примари-кей.
-        # http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.get
-        return 'Student not found', 404
+    if student is None:
+        return make_response(jsonify(
+            status='Student not found',
+            ), 404)
+
     else:  # иначе возвращаем информацию о студенте
-        return make_response(jsonify(student={
-            'id': student.id,
-            'group_number': student.group_number,
-            'name': student.name
-        }), 200)
+        return make_response(jsonify(
+            status='OK',
+            student=student.to_dict()
+        ), 200)
 
 
 @app.route('/students/group/<group_number>', methods=['GET'])
 def get_group(group_number):
     # достаем всех студентов из заданной группы
-    students = Student.query.filter_by(group_number=group_number).all()
+    students = Student.query.filter_by(group_number=group_number).first()
     if students is None:  # если нет ни одного студента в данной группе
         return 'Group not found', 404  # то возвращаем ошибку о том, что группа не найдена
     else:  # иначе создаем пустой словарь и заполняем имеющмися данными
-        students = {}
-        for student in students:
-            students[student.id] = student.name
-        # возвращаем json-результат
-        return make_response(jsonify(student={'group': group_number, 'name': students_list}), 200)
+        students = Student.query.filter_by(group_number=group_number)
+        return make_response(jsonify(
+            status='OK',
+            students=[student.to_dict() for student in students]  # делаем список словарей
+        ), 200)
 
 
 # ---POST---
@@ -451,24 +395,25 @@ def create_student():
     try:
         db.session.add(student)
         db.session.commit()
-        status_code = 201
+        status_code = 200
         status = "Created"
     except IntegrityError:
-        db.session.rollback()
-        student = Student.query.filter_by(name=name, group_number=group_number).first()
-        status_code = 200
-        status = "Found"
+        return make_response(
+            jsonify(status='Found same student'),
+            400
+        )
 
     return make_response(
         jsonify(status=status, student=student.to_dict()),
         status_code
     )
 
+
 # ---PUT---
 
 
 @app.route('/students/<int:student_id>', methods=['PUT'])
-def create_student(student_id):
+def edit_student(student_id):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
 
@@ -507,13 +452,12 @@ def create_student(student_id):
         student.name = name
         student.group_number = group_number
         db.session.commit()
-        status_code = 201
-        status = "Created"
-    except IntegrityError:
-        db.session.rollback()
-        student = Student.query.filter_by(name=name, group_number=group_number).first()
         status_code = 200
-        status = "Found"
+        status = 'Edited'
+    except IntegrityError:
+        return make_response(jsonify(
+            status='Found the same student',
+            ), 400)
 
     return make_response(
         jsonify(status=status, student=student.to_dict()),
@@ -524,20 +468,20 @@ def create_student(student_id):
 # ---DELETE---
 
 
-@app.route('/student/<int:student_id>', methods=['DELETE'])
+@app.route('/students/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
     # вытаскиваем студента по id
     student = Student.query.get(student_id)
 
-    if student is None:  # если студент не найден - вернуть ошибку.
-        # Model.query.get возвращает None, если в базе нет записи с таким
-        # примари-кей.
-        # http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.get
-        return 'Student not found', 404
-    else:  # иначе удаляем студента
-        db.session.delete(student)
-        db.session.commit()
-        return "Student is deleted", 200
+    if student is None:
+        status = 'Student not found'
+        status_code = 404
+    else:
+        status = "Student is deleted"
+        status_code = 200
+
+    return make_response(
+        jsonify(status=status), status_code)
 
 
 if __name__ == '__main__':
