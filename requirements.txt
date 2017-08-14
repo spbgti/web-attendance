@@ -2,3 +2,4 @@ sqlalchemy
 flask-sqlalchemy
 requests
 flask
+pytest
