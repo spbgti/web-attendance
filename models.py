@@ -25,6 +25,15 @@ class Student(db.Model):
             'group_number': self.group_number
         }
 
+    def save(self):
+        self.session.add(self)
+        self.session.commit()
+        return self
+
+    def __delete__(self, instance):
+        self.session.delete(self)
+        self.session.commit()
+
 
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,3 +58,12 @@ class Visit(db.Model):
             'pair_num': self.pair_num,
             'student_id': self.student_id
         }
+
+    def save(self):
+        self.session.add(self)
+        self.session.commit()
+        return self
+
+    def __delete__(self, instance):
+        self.session.delete(self)
+        self.session.commit()
