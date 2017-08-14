@@ -26,13 +26,12 @@ class Student(db.Model):
         }
 
     def save(self):
-        self.session.add(self)
-        self.session.commit()
-        return self
+        db.session.add(self)
+        db.session.commit()
 
-    def __delete__(self, instance):
-        self.session.delete(self)
-        self.session.commit()
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class Visit(db.Model):
@@ -60,10 +59,9 @@ class Visit(db.Model):
         }
 
     def save(self):
-        self.session.add(self)
-        self.session.commit()
-        return self
+        db.session.add(self)
+        db.session.commit()
 
-    def __delete__(self, instance):
-        self.session.delete(self)
-        self.session.commit()
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
