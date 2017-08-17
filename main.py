@@ -281,7 +281,7 @@ def edit_visit(visit_id):
         status = "Edited"
     except IntegrityError:
         return make_response(
-            jsonify(status='Found yhe same visit'),
+            jsonify(status='Found the same visit'),
             400
         )
 
