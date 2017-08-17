@@ -199,12 +199,17 @@ class TestBasicAPIStudent:
         assert resp.status_code == 400
         assert data == expected_data
 
-    def test_edit_student_repeat_data(self, db, test_client):
+    def test_delete_student(self, db, test_client):
         Student(name='name1', group_number='111').save()
-        Student(name='name2', group_number='222').save()
-        resp = test_client.put('/students/1', data=json.dumps(dict(name='name2', group_number='222')),
-                                content_type='application/json')
+        resp = test_client.delete('/students/1')
         data = json.loads(resp.data.decode())
-        expected_data = {'status': 'Found the same student'}
-        assert resp.status_code == 400
+        expected_data = {'status': 'Student is deleted'}
+        assert resp.status_code == 200
+        assert data == expected_data
+
+    def test_delete_non_existent_student(self, db, test_client):
+        resp = test_client.delete('/students/1')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Student not found'}
+        assert resp.status_code == 404
         assert data == expected_data

@@ -481,3 +481,20 @@ class TestBasicAPIVisit:
         expected_data = {'status': 'Found the same visit'}
         assert resp.status_code == 400
         assert data == expected_data
+
+    def test_delete_visit(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.delete('/visits/1')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Visit is deleted'}
+        assert resp.status_code == 200
+        assert data == expected_data
+
+    def test_delete_non_exsistnt_visit(self, db, test_client):
+        resp = test_client.delete('/visits/1')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Data not found'}
+        assert resp.status_code == 404
+        assert data == expected_data
