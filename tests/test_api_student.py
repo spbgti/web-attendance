@@ -45,7 +45,8 @@ class TestBasicAPIStudent:
                 name='name',
                 group_number='123')
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {
             'status': 'Created',
@@ -69,17 +70,17 @@ class TestBasicAPIStudent:
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data', [
-        (dict(fio='name', group_number='123'), {'status': 'Requires name and group_number values'}),
-        (dict(name='name', TEXT='123'), {'status': 'Requires name and group_number values'}),
+        (dict(group_number='123'), {'status': 'Requires name and group_number values'}),
+        (dict(name='name'), {'status': 'Requires name and group_number values'}),
         (dict(name=123, group_number='123'), {'status': 'name must be str value'}),
         (dict(name='name', group_number=123), {'status': 'group_number must be str value'})
-
     ])
     def test_create_student_wrong_input(self, db, test_client, data, expected_data):
         resp = test_client.post(
             '/students',
             data=json.dumps(data),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         assert resp.status_code == 400
         assert data == expected_data
@@ -92,7 +93,8 @@ class TestBasicAPIStudent:
                 name='name',
                 group_number='123')
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Found same student'}
         assert resp.status_code == 400
@@ -106,7 +108,8 @@ class TestBasicAPIStudent:
                 name='name11',
                 group_number='123')
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {
             'status': 'Edited',
@@ -124,7 +127,8 @@ class TestBasicAPIStudent:
         resp = test_client.put(
             '/students/1',
             data='TEXT',
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Invalid json'}
         assert resp.status_code == 400
@@ -137,15 +141,16 @@ class TestBasicAPIStudent:
                 name='name11',
                 group_number='123')
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Student not found'}
         assert resp.status_code == 404
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data', [
-        (dict(TEXT='name', group_number='123'), {'status': 'Requires name and group_number values'}),
-        (dict(name='name', TEXT='123'), {'status': 'Requires name and group_number values'}),
+        (dict(group_number='123'), {'status': 'Requires name and group_number values'}),
+        (dict(name='name'), {'status': 'Requires name and group_number values'}),
         (dict(name=123, group_number='123'), {'status': 'name must be str value'}),
         (dict(name='name', group_number=123), {'status': 'group_number must be str value'})
 
@@ -155,7 +160,8 @@ class TestBasicAPIStudent:
         resp = test_client.put(
             '/students/1',
             data=json.dumps(data),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         assert resp.status_code == 400
         assert data == expected_data

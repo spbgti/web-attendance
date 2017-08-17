@@ -62,7 +62,8 @@ class TestBasicAPIVisit:
                 date='2017.01.01',
                 pair_num=1)
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {
             'status': 'Created',
@@ -80,16 +81,17 @@ class TestBasicAPIVisit:
         resp = test_client.post(
             '/visits',
             data='Invalid json',
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Invalid json'}
         assert resp.status_code == 400
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data, status_code', [
-        (dict(TEXT=1, date='2017.01.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(sudent_id=1, TEXT='2017.01.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(student_id=1, date='2017.01.01', TEXT=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
+        (dict(date='2017.01.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
+        (dict(sudent_id=1, pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
+        (dict(student_id=1, date='2017.01.01'), {'status': 'Requires student_id, date and pair_num values'}, 400),
         (dict(student_id='1', date='2017.01.01', pair_num=1), {'status': 'student_id must be int value'}, 400),
         (dict(student_id=2, date='2017.01.01', pair_num=1), {'status': 'Student not found'}, 404),
         (dict(student_id=1, date='2017', pair_num=1), {'status': 'Invalid date format, try YYYY.MM.DD'}, 400),
@@ -102,7 +104,8 @@ class TestBasicAPIVisit:
         resp = test_client.post(
             '/visits',
             data=json.dumps(data),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         assert resp.status_code == status_code
         assert data == expected_data
@@ -118,7 +121,8 @@ class TestBasicAPIVisit:
                 date='2017.01.01',
                 pair_num=1)
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Found the same visit'}
         assert resp.status_code == 400
@@ -135,7 +139,8 @@ class TestBasicAPIVisit:
                 date='2017.03.01',
                 pair_num=1)
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {
             'status': 'Edited',
@@ -157,7 +162,8 @@ class TestBasicAPIVisit:
                 date='2017.03.01',
                 pair_num=1)
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Visit not found'}
         assert resp.status_code == 404
@@ -170,18 +176,17 @@ class TestBasicAPIVisit:
         resp = test_client.put(
             '/visits/1',
             data='TEXT',
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Invalid json'}
         assert resp.status_code == 400
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data, status_code', [
-        (dict(TEXT=1, date='2017.03.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(sudent_id=1, TEXT='2017.03.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'},
-         400),
-        (dict(student_id=1, date='2017.03.01', TEXT=1), {'status': 'Requires student_id, date and pair_num values'},
-         400),
+        (dict(date='2017.03.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
+        (dict(sudent_id=1, pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
+        (dict(student_id=1, date='2017.03.01'), {'status': 'Requires student_id, date and pair_num values'}, 400),
         (dict(student_id='1', date='2017.03.01', pair_num=1), {'status': 'student_id must be int value'}, 400),
         (dict(student_id=2, date='2017.03.01', pair_num=1), {'status': 'Student not found'}, 404),
         (dict(student_id=1, date='2017', pair_num=1), {'status': 'Invalid date format, try YYYY.MM.DD'}, 400),
@@ -195,7 +200,8 @@ class TestBasicAPIVisit:
         resp = test_client.put(
             '/visits/1',
             data=json.dumps(data),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         assert resp.status_code == status_code
         assert data == expected_data
@@ -212,7 +218,8 @@ class TestBasicAPIVisit:
                 date='2017.01.04',
                 pair_num=2)
             ),
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Found the same visit'}
         assert resp.status_code == 400
@@ -231,7 +238,7 @@ class TestBasicAPIVisit:
     def test_delete_non_exsistnt_visit(self, db, test_client):
         resp = test_client.delete('/visits/1')
         data = json.loads(resp.data.decode())
-        expected_data = {'status': 'Data not found'}
+        expected_data = {'status': 'Visit not found'}
         assert resp.status_code == 404
         assert data == expected_data
 

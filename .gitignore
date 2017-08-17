@@ -1,4 +1,2 @@
-.idea
+*.idea
 *.db
-test.txt
-test.py

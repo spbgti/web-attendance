@@ -9,11 +9,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db.init_app(app)
 
 
-# ---------------VISIT---------------
-
-# ---GET---
-
-
 @app.route('/visits/<int:visit_id>', methods=['GET'])
 def get_visit_by_id(visit_id):
     visit = Visit.query.get(visit_id)
@@ -21,7 +16,8 @@ def get_visit_by_id(visit_id):
     if visit is None:
         return make_response(
             jsonify(status="Visit not found"),
-            404)
+            404
+        )
 
     return make_response(
         jsonify(
@@ -46,7 +42,7 @@ def get_all_visits():
 
 
 @app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
-def get_visits_day(student_id, pair_date):
+def get_visits_by_day(student_id, pair_date):
     student = Student.query.get(student_id)
 
     if student is None:
@@ -57,7 +53,7 @@ def get_visits_day(student_id, pair_date):
 
     try:
         pair_date = datetime.strptime(pair_date, '%Y.%m.%d').date()
-    except ValueError:  # ловим исключение, и прописываем действие
+    except ValueError:
         return make_response(
             jsonify(status='Invalid date format, try YYYY.MM.DD'),
             400
@@ -84,7 +80,7 @@ def get_visits_day(student_id, pair_date):
 
 
 @app.route('/visits/student/<int:student_id>/week/<week_start>', methods=['GET'])
-def get_visits_week(student_id, week_start):
+def get_visits_by_week(student_id, week_start):
     student = Student.query.get(student_id)
 
     if student is None:
@@ -95,7 +91,7 @@ def get_visits_week(student_id, week_start):
 
     try:
         week_start = datetime.strptime(week_start, '%Y.%m.%d').date()
-    except ValueError:  # ловим исключение, и прописываем действие
+    except ValueError:
         return make_response(
             jsonify(status='Invalid date format, try YYYY.MM.DD'),
             400
@@ -111,7 +107,6 @@ def get_visits_week(student_id, week_start):
         for visit in visits_by_day:
             pair_visits[visit.pair_num] = True
 
-        # заполняем день
         visits_by_week[str(week_start)] = pair_visits
         week_start += timedelta(days=1)
 
@@ -125,9 +120,6 @@ def get_visits_week(student_id, week_start):
         ),
         200
     )
-
-
-# ---POST---
 
 
 @app.route('/visits', methods=['POST'])
@@ -150,8 +142,7 @@ def create_visit():
             400
         )
 
-    # студент
-    if not isinstance(student_id, int):  # проверяем что student_id - int
+    if not isinstance(student_id, int):
         return make_response(
             jsonify(status="student_id must be int value"),
             400
@@ -164,7 +155,6 @@ def create_visit():
             404
         )
 
-    # дата
     try:
         pair_date = datetime.strptime(pair_date, '%Y.%m.%d').date()
     except ValueError:
@@ -173,7 +163,6 @@ def create_visit():
             400
         )
 
-    # номер пары
     if not isinstance(pair_num, int):
         return make_response(
             jsonify(status="pair_num must be int value"),
@@ -188,8 +177,7 @@ def create_visit():
 
     visit = Visit(date=pair_date, pair_num=pair_num, student=student)
     try:
-        db.session.add(visit)
-        db.session.commit()
+        visit.save()
         status_code = 201
         status = "Created"
     except IntegrityError:
@@ -207,17 +195,16 @@ def create_visit():
     )
 
 
-# ---PUT---
-
-
 @app.route('/visits/<int:visit_id>', methods=['PUT'])
 def edit_visit(visit_id):
     visit = Visit.query.get(visit_id)
 
     if visit is None:
-        return make_response(jsonify(status="Visit not found"), 404)
+        return make_response(
+            jsonify(status="Visit not found"),
+            404
+        )
 
-    # извлекаем данные
     visit_data = request.get_json(silent=True)
 
     if visit_data is None:
@@ -236,8 +223,7 @@ def edit_visit(visit_id):
             400
         )
 
-    # студент
-    if not isinstance(student_id, int):  # проверяем что student_id - int
+    if not isinstance(student_id, int):
         return make_response(
             jsonify(status="student_id must be int value"),
             400
@@ -250,7 +236,6 @@ def edit_visit(visit_id):
             404
         )
 
-    # дата
     try:
         pair_date = datetime.strptime(pair_date, '%Y.%m.%d').date()
     except ValueError:
@@ -259,7 +244,6 @@ def edit_visit(visit_id):
             400
         )
 
-    # номер пары
     if not isinstance(pair_num, int):
         return make_response(
             jsonify(status="pair_num must be int value"),
@@ -294,19 +278,15 @@ def edit_visit(visit_id):
     )
 
 
-# ---DELETE---
-
-
 @app.route('/visits/<int:visit_id>', methods=['DELETE'])
 def delete_visit(visit_id):
     visit = Visit.query.get(visit_id) 
 
     if visit is None:
-        status = 'Data not found'
+        status = 'Visit not found'
         status_code = 404
-    else:  # иначе удаляем студента
-        db.session.delete(visit)
-        db.session.commit()
+    else:
+        visit.delete()
         status = "Visit is deleted"
         status_code = 200
 
@@ -316,11 +296,6 @@ def delete_visit(visit_id):
     )
 
 
-# ---------------STUDENT-------------
-
-# ---GET---
-
-
 @app.route('/students', methods=['GET'])
 def get_all_students():
     students_all = Student.query.all()
@@ -328,7 +303,7 @@ def get_all_students():
     return make_response(
         jsonify(
             status='OK',
-            students=[student.to_dict() for student in students_all]  # делаем список словарей
+            students=[student.to_dict() for student in students_all]
         ),
         200
     )
@@ -355,8 +330,7 @@ def get_student_by_id(student_id):
 
 
 @app.route('/students/group/<group_number>', methods=['GET'])
-def get_group(group_number):
-    # достаем всех студентов из заданной группы
+def get_students_by_group(group_number):
     students = Student.query.filter_by(group_number=group_number).first()
 
     if students is None:
@@ -370,13 +344,10 @@ def get_group(group_number):
         return make_response(
             jsonify(
                 status='OK',
-                students=[student.to_dict() for student in students]  # делаем список словарей
+                students=[student.to_dict() for student in students]
             ),
             200
         )
-
-
-# ---POST---
 
 
 @app.route('/students', methods=['POST'])
@@ -412,8 +383,7 @@ def create_student():
 
     student = Student(name=name, group_number=group_number)
     try:
-        db.session.add(student)
-        db.session.commit()
+        student.save()
         status_code = 201
         status = "Created"
     except IntegrityError:
@@ -431,12 +401,8 @@ def create_student():
     )
 
 
-# ---PUT---
-
-
 @app.route('/students/<int:student_id>', methods=['PUT'])
 def edit_student(student_id):
-    # вытаскиваем студента по id
     student = Student.query.get(student_id)
 
     if student is None:
@@ -493,20 +459,15 @@ def edit_student(student_id):
     )
 
 
-# ---DELETE---
-
-
 @app.route('/students/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
-    # вытаскиваем студента по id
     student = Student.query.get(student_id)
 
     if student is None:
         status = 'Student not found'
         status_code = 404
     else:
-        db.session.delete(student)
-        db.session.commit()
+        student.delete()
         status = "Student is deleted"
         status_code = 200
 
