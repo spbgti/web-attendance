@@ -9,7 +9,7 @@ def test_client(app):
 
 
 class TestBasicAPIStudent:
-    def test_get_by_id(self, db, test_client):
+    def test_get_student_by_id(self, db, test_client):
         Student(name='name', group_number='123').save()
         resp = test_client.get('/students/1')
         data = json.loads(resp.data.decode())
@@ -19,7 +19,7 @@ class TestBasicAPIStudent:
         assert resp.status_code == 200
         assert data == expected_data
 
-    def test_get_nonexist_student(self, db, test_client):
+    def test_get_non_existent_student(self, db, test_client):
         resp = test_client.get('/students/1')
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Student not found'}
@@ -32,7 +32,7 @@ class TestBasicAPIStudent:
         Student(name='name3', group_number='123').save()
         resp = test_client.get('/students')
         data = json.loads(resp.data.decode())
-        expected_data ={
+        expected_data = {
             'status': 'OK',
             'students': [
                 {'group_number': '123', 'id': 1, 'name': 'name1'},
@@ -47,9 +47,10 @@ class TestBasicAPIStudent:
         Student(name='name1', group_number='123').save()
         Student(name='name2', group_number='124').save()
         Student(name='name3', group_number='123').save()
+        Student(name='name4', group_number='123M').save()
         resp = test_client.get('/students/group/123')
         data = json.loads(resp.data.decode())
-        expected_data ={
+        expected_data = {
             'status': 'OK',
             'students': [
                 {'group_number': '123', 'id': 1, 'name': 'name1'},
@@ -59,11 +60,9 @@ class TestBasicAPIStudent:
         assert data == expected_data
         assert resp.status_code == 200
 
-    def test_get_null_group(self, db, test_client):
+    def test_get_non_existent_group(self, db, test_client):
         resp = test_client.get('/students/group/111')
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Group not found'}
         assert data == expected_data
         assert resp.status_code == 404
-
-

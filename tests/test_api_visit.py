@@ -10,7 +10,7 @@ def test_client(app):
 
 
 class TestBasicAPIVisit:
-    def test_get_by_id(self, db, test_client):
+    def test_get_visit_by_id(self, db, test_client):
         student = Student(name='name', group_number='123')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -29,7 +29,7 @@ class TestBasicAPIVisit:
         assert resp.status_code == 200
         assert data == expected_data
 
-    def test_get_null_visit(self, db, test_client):
+    def test_get_non_existent_visit(self, db, test_client):
         resp = test_client.get('/visits/1')
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Visit not found'}
@@ -57,7 +57,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 200
 
-    def test_get_day(self, db, test_client):
+    def test_get_visit_by_day(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -80,7 +80,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 200
 
-    def test_get_day_null_student(self, db, test_client):
+    def test_get_visit_by_day_non_existent_student(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -91,7 +91,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 404
 
-    def test_get_day_null_data(self, db, test_client):
+    def test_get_visit_by_day_invalid_data(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -102,7 +102,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 400
 
-    def test_get_week(self, db, test_client):
+    def test_get_visit_by_week(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -164,7 +164,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 200
 
-    def test_get_week_null_student(self, db, test_client):
+    def test_get_visit_by_week_non_existent_student(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -175,7 +175,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 404
 
-    def test_get_week_null_data(self, db, test_client):
+    def test_get_visit_by_week_invalid_data(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
