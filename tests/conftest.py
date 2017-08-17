@@ -19,3 +19,7 @@ def db(app):
     _db.create_all()
     yield _db
     _db.drop_all()
+
+@pytest.fixture
+def test_client(app):
+    return app.test_client()
