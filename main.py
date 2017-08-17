@@ -161,7 +161,7 @@ def create_visit():
     if student is None:
         return make_response(
             jsonify(status="Student not found"),
-            400
+            404
         )
 
     # дата
@@ -247,7 +247,7 @@ def edit_visit(visit_id):
     if student is None:
         return make_response(
             jsonify(status="Student not found"),
-            400
+            404
         )
 
     # дата
@@ -414,7 +414,7 @@ def create_student():
     try:
         db.session.add(student)
         db.session.commit()
-        status_code = 200
+        status_code = 201
         status = "Created"
     except IntegrityError:
         return make_response(

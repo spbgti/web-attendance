@@ -36,7 +36,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 404
 
-    def test_get_all_visits(self, db, test_client):
+    def test_get_all_visit(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -91,7 +91,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 404
 
-    def test_get_visit_by_day_invalid_data(self, db, test_client):
+    def test_get_visit_by_day_invalid_date(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -175,7 +175,7 @@ class TestBasicAPIVisit:
         assert data == expected_data
         assert resp.status_code == 404
 
-    def test_get_visit_by_week_invalid_data(self, db, test_client):
+    def test_get_visit_by_week_invalid_date(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
@@ -185,3 +185,299 @@ class TestBasicAPIVisit:
         expected_data = {"status": "Invalid date format, try YYYY.MM.DD"}
         assert data == expected_data
         assert resp.status_code == 400
+
+    def test_get_visit_by_week_between(self, db, test_client):
+        student = Student(name='name1', group_number='111')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=2).save()
+        Visit(student=student, date=date(2017, 1, 2), pair_num=4).save()
+        Visit(student=student, date=date(2017, 1, 3), pair_num=3).save()
+        resp = test_client.get('/visits/student/1/week/2016.12.30')
+        data = json.loads(resp.data.decode())
+        expected_data = {
+            "status": "OK",
+            "visits": {
+                "pairs": {
+                    "2016-12-30": {
+                        "1": False,
+                        "2": False,
+                        "3": False,
+                        "4": False
+                    },
+                    "2016-12-31": {
+                        "1": False,
+                        "2": False,
+                        "3": False,
+                        "4": False
+                    },
+                    "2017-01-01": {
+                        "1": True,
+                        "2": True,
+                        "3": False,
+                        "4": False
+                    },
+                    "2017-01-02": {
+                        "1": False,
+                        "2": False,
+                        "3": False,
+                        "4": True
+                    },
+                    "2017-01-03": {
+                        "1": False,
+                        "2": False,
+                        "3": True,
+                        "4": False
+                    },
+                    "2017-01-04": {
+                        "1": False,
+                        "2": False,
+                        "3": False,
+                        "4": False
+                    },
+                    "2017-01-05": {
+                        "1": False,
+                        "2": False,
+                        "3": False,
+                        "4": False
+                    }
+                },
+                "student": 1
+            }
+        }
+        assert data == expected_data
+        assert resp.status_code == 200
+
+    def test_create_visit(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, date='2017.01.01', pair_num=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {
+            'status': 'Created',
+            "visit": {
+                "date": "2017.01.01",
+                "id": 1,
+                "pair_num": 1,
+                "student_id": 1
+            }
+        }
+        assert resp.status_code == 201
+        assert data == expected_data
+
+    def test_create_visit_invalid_json(self, db, test_client):
+        resp = test_client.post('/visits', data='Invalid json', content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Invalid json'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_requires_student_id_value(self, db, test_client):
+        resp = test_client.post('/visits', data=json.dumps(dict(TEXT=1, date='2017.01.01', pair_num=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Requires student_id, date and pair_num values'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_requires_date_value(self, db, test_client):
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, TEXT='2017.01.01', pair_num=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Requires student_id, date and pair_num values'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_requires_pair_num_value(self, db, test_client):
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, date='2017.01.01', TEXT=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Requires student_id, date and pair_num values'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_wrong_type_student_id(self, db, test_client):
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id='1', date='2017.01.01', pair_num=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'student_id must be int value'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_non_existent_student(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=2, date='2017.01.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Student not found'}
+        assert resp.status_code == 404
+        assert data == expected_data
+
+    def test_create_visit_invalid_date(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, date='2017', pair_num=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Invalid date format, try YYYY.MM.DD'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_wrong_pair_num_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, date='2017.01.01', pair_num='1')), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'pair_num must be int value'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_wrong_pair_num_num_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, date='2017.01.01', pair_num=10)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'pair_num must be from 1 to 4'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_create_visit_repeat_data(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017,1,1), pair_num=1).save()
+        resp = test_client.post('/visits', data=json.dumps(dict(student_id=1, date='2017.01.01', pair_num=1)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Found the same visit'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017.03.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {
+            'status': 'Edited',
+            "visit": {
+                "date": "2017.03.01",
+                "id": 1,
+                "pair_num": 1,
+                "student_id": 1
+            }
+        }
+        assert resp.status_code == 200
+        assert data == expected_data
+
+    def test_edit_non_existent_visit(self, db, test_client):
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017.03.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Visit not found'}
+        assert resp.status_code == 404
+        assert data == expected_data
+
+    def test_edit_visit_invalid_json(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data='TEXT',
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Invalid json'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_requires_student_id_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(TEXT=1, date='2017.03.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Requires student_id, date and pair_num values'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_requires_date_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, TEXT='2017.03.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Requires student_id, date and pair_num values'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_requires_pair_num_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017.03.01', TEXT=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Requires student_id, date and pair_num values'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_wrong_student_id_type(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id='1', date='2017.03.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'student_id must be int value'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_non_existent_student(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=2, date='2017.03.01', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Student not found'}
+        assert resp.status_code == 404
+        assert data == expected_data
+
+    def test_edit_visit_invalid_date(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017', pair_num=1)),
+                                content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Invalid date format, try YYYY.MM.DD'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_wrong_pair_num_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017.01.01', pair_num='1')), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'pair_num must be int value'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_wrong_pair_num_num_value(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017.01.01', pair_num=10)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'pair_num must be from 1 to 4'}
+        assert resp.status_code == 400
+        assert data == expected_data
+
+    def test_edit_visit_repeat_data(self, db, test_client):
+        student = Student(name='name', group_number='123')
+        student.save()
+        Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
+        Visit(student=student, date=date(2017, 1, 4), pair_num=2).save()
+        resp = test_client.put('/visits/1', data=json.dumps(dict(student_id=1, date='2017.01.04', pair_num=2)), content_type='application/json')
+        data = json.loads(resp.data.decode())
+        expected_data = {'status': 'Found the same visit'}
+        assert resp.status_code == 400
+        assert data == expected_data
