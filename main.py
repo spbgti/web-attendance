@@ -11,6 +11,11 @@ db.init_app(app)
 
 @app.route('/visits/<int:visit_id>', methods=['GET'])
 def get_visit_by_id(visit_id):
+    """
+    Получение информации о посещении по его идентефикатору
+    :param visit_id:
+    :return:
+    """
     visit = Visit.query.get(visit_id)
 
     if visit is None:
@@ -30,6 +35,10 @@ def get_visit_by_id(visit_id):
 
 @app.route('/visits', methods=['GET'])
 def get_all_visits():
+    """
+    Получение информации о всех посещениях в базе данных
+    :return:
+    """
     visits = Visit.query.all()
 
     return make_response(
@@ -43,6 +52,12 @@ def get_all_visits():
 
 @app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
 def get_visits_by_day(student_id, pair_date):
+    """
+    Полечение информации о посещениях студента за конкретный день
+    :param student_id:
+    :param pair_date:
+    :return:
+    """
     student = Student.query.get(student_id)
 
     if student is None:
@@ -81,6 +96,12 @@ def get_visits_by_day(student_id, pair_date):
 
 @app.route('/visits/student/<int:student_id>/week/<week_start>', methods=['GET'])
 def get_visits_by_week(student_id, week_start):
+    """
+    Получение информации о посещениях студента за неделю(7 дней)
+    :param student_id:
+    :param week_start:
+    :return:
+    """
     student = Student.query.get(student_id)
 
     if student is None:
@@ -124,6 +145,10 @@ def get_visits_by_week(student_id, week_start):
 
 @app.route('/visits', methods=['POST'])
 def create_visit():
+    """
+    Внесение в базу данных нового посещения
+    :return:
+    """
     visit_data = request.get_json(silent=True)
 
     if visit_data is None:
@@ -197,6 +222,11 @@ def create_visit():
 
 @app.route('/visits/<int:visit_id>', methods=['PUT'])
 def edit_visit(visit_id):
+    """
+    Редактирование информации о посещении, через его идентификатор
+    :param visit_id:
+    :return:
+    """
     visit = Visit.query.get(visit_id)
 
     if visit is None:
@@ -280,6 +310,11 @@ def edit_visit(visit_id):
 
 @app.route('/visits/<int:visit_id>', methods=['DELETE'])
 def delete_visit(visit_id):
+    """
+    Удаление посещения из базы данных через его идентификатор
+    :param visit_id:
+    :return:
+    """
     visit = Visit.query.get(visit_id) 
 
     if visit is None:
@@ -298,6 +333,10 @@ def delete_visit(visit_id):
 
 @app.route('/students', methods=['GET'])
 def get_all_students():
+    """
+    Получение полного списка студентов
+    :return:
+    """
     students_all = Student.query.all()
 
     return make_response(
@@ -311,6 +350,11 @@ def get_all_students():
 
 @app.route('/students/<int:student_id>', methods=['GET'])
 def get_student_by_id(student_id):
+    """
+    Получение информации о студенте через его идентификатор
+    :param student_id:
+    :return:
+    """
     student = Student.query.get(student_id)
 
     if student is None:
@@ -331,6 +375,11 @@ def get_student_by_id(student_id):
 
 @app.route('/students/group/<group_number>', methods=['GET'])
 def get_students_by_group(group_number):
+    """
+    Получение информации о группе студентов
+    :param group_number:
+    :return:
+    """
     students = Student.query.filter_by(group_number=group_number).first()
 
     if students is None:
@@ -352,6 +401,10 @@ def get_students_by_group(group_number):
 
 @app.route('/students', methods=['POST'])
 def create_student():
+    """
+    Создание нового студента в базе данных
+    :return:
+    """
     student_data = request.get_json(silent=True)
 
     if student_data is None:
@@ -403,6 +456,11 @@ def create_student():
 
 @app.route('/students/<int:student_id>', methods=['PUT'])
 def edit_student(student_id):
+    """
+    Редактирование информациии о студенте через его идентификатор
+    :param student_id:
+    :return:
+    """
     student = Student.query.get(student_id)
 
     if student is None:
@@ -461,6 +519,11 @@ def edit_student(student_id):
 
 @app.route('/students/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
+    """
+    Удаление студента из базы данных через его идентификатор
+    :param student_id:
+    :return:
+    """
     student = Student.query.get(student_id)
 
     if student is None:

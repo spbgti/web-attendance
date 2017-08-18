@@ -10,6 +10,7 @@ def app():
     yield _app
     ctx.pop()
 
+
 @pytest.yield_fixture
 def db(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'

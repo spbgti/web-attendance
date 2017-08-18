@@ -5,6 +5,9 @@ import pytest
 
 
 class TestBasicAPIVisit:
+    """
+        Содержит тесты для объектов с базовым API типа: /object и /object/<object_id>
+    """
     def test_get_visit_by_id(self, db, test_client):
         student = Student(name='name', group_number='123')
         student.save()
@@ -244,6 +247,9 @@ class TestBasicAPIVisit:
 
 
 class TestExpandedAPIVisit:
+    """
+    Содержит тесты для объектов с API отличным от базового
+    """
     def test_get_visit_by_day(self, db, test_client):
         student = Student(name='name1', group_number='111')
         student.save()

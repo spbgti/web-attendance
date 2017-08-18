@@ -4,6 +4,9 @@ import pytest
 
 
 class TestBasicAPIStudent:
+    """
+    Содержит тесты для объектов с базовым API типа: /object и /object/<object_id>
+    """
     def test_get_student_by_id(self, db, test_client):
         Student(name='name', group_number='123').save()
         resp = test_client.get('/students/1')
@@ -184,6 +187,9 @@ class TestBasicAPIStudent:
 
 
 class TestExpandedAPIStudent:
+    """
+    Содержит тесты для объектов с API отличающимся от базовых
+    """
     def test_get_group(self, db, test_client):
         Student(name='name1', group_number='123').save()
         Student(name='name2', group_number='124').save()
