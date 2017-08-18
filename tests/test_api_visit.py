@@ -90,7 +90,7 @@ class TestBasicAPIVisit:
 
     @pytest.mark.parametrize('data, expected_data, status_code', [
         ({'date': '2017.01.01', 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
-        ({'sudent_id': 1, 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'student_id': 1, 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
         ({'student_id': 1, 'date': '2017.01.01'}, {'status': 'Requires student_id, date and pair_num values'}, 400),
         ({'student_id': '1', 'date': '2017.01.01', 'pair_num': 1}, {'status': 'student_id must be int value'}, 400),
         ({'student_id': 2, 'date': '2017.01.01', 'pair_num': 1}, {'status': 'Student not found'}, 404),
