@@ -107,7 +107,7 @@ def get_visits_by_week(student_id, week_start):
         for visit in visits_by_day:
             pair_visits[visit.pair_num] = True
 
-        visits_by_week[str(week_start)] = pair_visits
+        visits_by_week[week_start.strftime('%Y.%m.%d')] = pair_visits
         week_start += timedelta(days=1)
 
     return make_response(

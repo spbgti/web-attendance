@@ -41,10 +41,10 @@ class TestBasicAPIStudent:
     def test_create_student(self, db, test_client):
         resp = test_client.post(
             '/students',
-            data=json.dumps(dict(
-                name='name',
-                group_number='123')
-            ),
+            data=json.dumps({
+                'name': 'name',
+                'group_number': '123'
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -63,17 +63,18 @@ class TestBasicAPIStudent:
         resp = test_client.post(
             '/students',
             data="invalid json",
-            content_type='application/json')
+            content_type='application/json'
+        )
         data = json.loads(resp.data.decode())
         expected_data = {'status': 'Invalid json'}
         assert resp.status_code == 400
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data', [
-        (dict(group_number='123'), {'status': 'Requires name and group_number values'}),
-        (dict(name='name'), {'status': 'Requires name and group_number values'}),
-        (dict(name=123, group_number='123'), {'status': 'name must be str value'}),
-        (dict(name='name', group_number=123), {'status': 'group_number must be str value'})
+        ({'group_number': '123'}, {'status': 'Requires name and group_number values'}),
+        ({'name': 'name'}, {'status': 'Requires name and group_number values'}),
+        ({'name': 123, 'group_number': '123'}, {'status': 'name must be str value'}),
+        ({'name': 'name', 'group_number': 123}, {'status': 'group_number must be str value'})
     ])
     def test_create_student_wrong_input(self, db, test_client, data, expected_data):
         resp = test_client.post(
@@ -89,10 +90,10 @@ class TestBasicAPIStudent:
         Student(name='name', group_number='123').save()
         resp = test_client.post(
             '/students',
-            data=json.dumps(dict(
-                name='name',
-                group_number='123')
-            ),
+            data=json.dumps({
+                'name': 'name',
+                'group_number': '123'
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -104,10 +105,10 @@ class TestBasicAPIStudent:
         Student(name='name1', group_number='111').save()
         resp = test_client.put(
             '/students/1',
-            data=json.dumps(dict(
-                name='name11',
-                group_number='123')
-            ),
+            data=json.dumps({
+                'name': 'name11',
+                'group_number': '123'
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -137,10 +138,10 @@ class TestBasicAPIStudent:
     def test_edit_student_non_existent_student(self, db, test_client):
         resp = test_client.put(
             '/students/1',
-            data=json.dumps(dict(
-                name='name11',
-                group_number='123')
-            ),
+            data=json.dumps({
+                'name': 'name11',
+                'group_number': '123'
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -149,10 +150,10 @@ class TestBasicAPIStudent:
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data', [
-        (dict(group_number='123'), {'status': 'Requires name and group_number values'}),
-        (dict(name='name'), {'status': 'Requires name and group_number values'}),
-        (dict(name=123, group_number='123'), {'status': 'name must be str value'}),
-        (dict(name='name', group_number=123), {'status': 'group_number must be str value'})
+        ({'group_number': '123'}, {'status': 'Requires name and group_number values'}),
+        ({'name': 'name'}, {'status': 'Requires name and group_number values'}),
+        ({'name': 123, 'group_number': '123'}, {'status': 'name must be str value'}),
+        ({'name': 'name', 'group_number': 123}, {'status': 'group_number must be str value'})
 
     ])
     def test_edit_student_wrong_input(self, db, test_client, data, expected_data):

@@ -57,11 +57,11 @@ class TestBasicAPIVisit:
         student.save()
         resp = test_client.post(
             '/visits',
-            data=json.dumps(dict(
-                student_id=1,
-                date='2017.01.01',
-                pair_num=1)
-            ),
+            data=json.dumps({
+                'student_id': 1,
+                'date': '2017.01.01',
+                'pair_num': 1
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -89,14 +89,14 @@ class TestBasicAPIVisit:
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data, status_code', [
-        (dict(date='2017.01.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(sudent_id=1, pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(student_id=1, date='2017.01.01'), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(student_id='1', date='2017.01.01', pair_num=1), {'status': 'student_id must be int value'}, 400),
-        (dict(student_id=2, date='2017.01.01', pair_num=1), {'status': 'Student not found'}, 404),
-        (dict(student_id=1, date='2017', pair_num=1), {'status': 'Invalid date format, try YYYY.MM.DD'}, 400),
-        (dict(student_id=1, date='2017.01.01', pair_num='1'), {'status': 'pair_num must be int value'}, 400),
-        (dict(student_id=1, date='2017.01.01', pair_num=10), {'status': 'pair_num must be from 1 to 4'}, 400),
+        ({'date': '2017.01.01', 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'sudent_id': 1, 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'student_id': 1, 'date': '2017.01.01'}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'student_id': '1', 'date': '2017.01.01', 'pair_num': 1}, {'status': 'student_id must be int value'}, 400),
+        ({'student_id': 2, 'date': '2017.01.01', 'pair_num': 1}, {'status': 'Student not found'}, 404),
+        ({'student_id': 1, 'date': '2017', 'pair_num': 1}, {'status': 'Invalid date format, try YYYY.MM.DD'}, 400),
+        ({'student_id': 1, 'date': '2017.01.01', 'pair_num': '1'}, {'status': 'pair_num must be int value'}, 400),
+        ({'student_id': 1, 'date': '2017.01.01', 'pair_num': 10}, {'status': 'pair_num must be from 1 to 4'}, 400),
     ])
     def test_create_visit_wrong_input(self, db, test_client, data, expected_data, status_code):
         student = Student(name='name', group_number='123')
@@ -116,11 +116,11 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017,1,1), pair_num=1).save()
         resp = test_client.post(
             '/visits',
-            data=json.dumps(dict(
-                student_id=1,
-                date='2017.01.01',
-                pair_num=1)
-            ),
+            data=json.dumps({
+                'student_id': 1,
+                'date': '2017.01.01',
+                'pair_num': 1
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -134,11 +134,11 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps(dict(
-                student_id=1,
-                date='2017.03.01',
-                pair_num=1)
-            ),
+            data=json.dumps({
+                'student_id': 1,
+                'date': '2017.03.01',
+                'pair_num': 1
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -157,11 +157,11 @@ class TestBasicAPIVisit:
     def test_edit_non_existent_visit(self, db, test_client):
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps(dict(
-                student_id=1,
-                date='2017.03.01',
-                pair_num=1)
-            ),
+            data=json.dumps({
+                'student_id': 1,
+                'date': '2017.03.01',
+                'pair_num': 1
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -184,14 +184,14 @@ class TestBasicAPIVisit:
         assert data == expected_data
 
     @pytest.mark.parametrize('data, expected_data, status_code', [
-        (dict(date='2017.03.01', pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(sudent_id=1, pair_num=1), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(student_id=1, date='2017.03.01'), {'status': 'Requires student_id, date and pair_num values'}, 400),
-        (dict(student_id='1', date='2017.03.01', pair_num=1), {'status': 'student_id must be int value'}, 400),
-        (dict(student_id=2, date='2017.03.01', pair_num=1), {'status': 'Student not found'}, 404),
-        (dict(student_id=1, date='2017', pair_num=1), {'status': 'Invalid date format, try YYYY.MM.DD'}, 400),
-        (dict(student_id=1, date='2017.03.01', pair_num='1'), {'status': 'pair_num must be int value'}, 400),
-        (dict(student_id=1, date='2017.03.01', pair_num=10), {'status': 'pair_num must be from 1 to 4'}, 400),
+        ({'date': '2017.03.01', 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'student_id': 1, 'pair_num': 1}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'student_id': 1, 'date': '2017.03.01'}, {'status': 'Requires student_id, date and pair_num values'}, 400),
+        ({'student_id': '1', 'date': '2017.03.01', 'pair_num': 1}, {'status': 'student_id must be int value'}, 400),
+        ({'student_id': 2, 'date': '2017.03.01', 'pair_num': 1}, {'status': 'Student not found'}, 404),
+        ({'student_id': 1, 'date': '2017', 'pair_num': 1}, {'status': 'Invalid date format, try YYYY.MM.DD'}, 400),
+        ({'student_id': 1, 'date': '2017.03.01', 'pair_num': '1'}, {'status': 'pair_num must be int value'}, 400),
+        ({'student_id': 1, 'date': '2017.03.01', 'pair_num': 10}, {'status': 'pair_num must be from 1 to 4'}, 400),
     ])
     def test_edit_visit_wrong_input(self, db, test_client, data, expected_data, status_code):
         student = Student(name='name', group_number='123')
@@ -213,11 +213,11 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017, 1, 4), pair_num=2).save()
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps(dict(
-                student_id=1,
-                date='2017.01.04',
-                pair_num=2)
-            ),
+            data=json.dumps({
+                'student_id': 1,
+                'date': '2017.01.04',
+                'pair_num': 2
+            }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode())
@@ -302,43 +302,43 @@ class TestExpandedAPIVisit:
             "status": "OK",
             "visits": {
                 "pairs": {
-                    "2017-01-01": {
+                    "2017.01.01": {
                         "1": True,
                         "2": True,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-02": {
+                    "2017.01.02": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": True
                     },
-                    "2017-01-03": {
+                    "2017.01.03": {
                         "1": False,
                         "2": False,
                         "3": True,
                         "4": False
                     },
-                    "2017-01-04": {
+                    "2017.01.04": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-05": {
+                    "2017.01.05": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-06": {
+                    "2017.01.06": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-07": {
+                    "2017.01.07": {
                         "1": False,
                         "2": False,
                         "3": False,
@@ -386,43 +386,43 @@ class TestExpandedAPIVisit:
             "status": "OK",
             "visits": {
                 "pairs": {
-                    "2016-12-30": {
+                    "2016.12.30": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": False
                     },
-                    "2016-12-31": {
+                    "2016.12.31": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-01": {
+                    "2017.01.01": {
                         "1": True,
                         "2": True,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-02": {
+                    "2017.01.02": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": True
                     },
-                    "2017-01-03": {
+                    "2017.01.03": {
                         "1": False,
                         "2": False,
                         "3": True,
                         "4": False
                     },
-                    "2017-01-04": {
+                    "2017.01.04": {
                         "1": False,
                         "2": False,
                         "3": False,
                         "4": False
                     },
-                    "2017-01-05": {
+                    "2017.01.05": {
                         "1": False,
                         "2": False,
                         "3": False,
