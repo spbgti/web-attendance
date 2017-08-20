@@ -14,7 +14,7 @@ def get_visit_by_id(visit_id):
     """
     Получение информации о посещении по его идентефикатору
     :param visit_id:
-    :return:
+    :return: json-информацию о посещении: статус запроса, детали посещения, код выполнения запроса
     """
     visit = Visit.query.get(visit_id)
 
@@ -37,7 +37,7 @@ def get_visit_by_id(visit_id):
 def get_all_visits():
     """
     Получение информации о всех посещениях в базе данных
-    :return:
+    :return: json-информацию о посещениях: статус запроса, информацию о каждом посещении, код выполнения запроса
     """
     visits = Visit.query.all()
 
@@ -56,7 +56,12 @@ def get_visits_by_day(student_id, pair_date):
     Полечение информации о посещениях студента за конкретный день
     :param student_id:
     :param pair_date:
-    :return:
+    :return:json-информацию о посещении:
+        статус запроса,
+        id студента,
+        дату,
+        информацию о всех парах,
+        код выполнения запроса
     """
     student = Student.query.get(student_id)
 
@@ -100,7 +105,11 @@ def get_visits_by_week(student_id, week_start):
     Получение информации о посещениях студента за неделю(7 дней)
     :param student_id:
     :param week_start:
-    :return:
+    :return:json-информацию о посещении:
+        статус запроса,
+        id студента,
+        посещение пар за каждый из 7 дней,
+        код выполнения запроса
     """
     student = Student.query.get(student_id)
 
@@ -147,7 +156,7 @@ def get_visits_by_week(student_id, week_start):
 def create_visit():
     """
     Внесение в базу данных нового посещения
-    :return:
+    :return:json-информацию о посещении: статус запроса, детали созданного посещения, код выполнения запроса
     """
     visit_data = request.get_json(silent=True)
 
@@ -225,7 +234,7 @@ def edit_visit(visit_id):
     """
     Редактирование информации о посещении, через его идентификатор
     :param visit_id:
-    :return:
+    :return: json-информацию о посещении: статус запроса, детали измененного посещения, код выполнения запроса
     """
     visit = Visit.query.get(visit_id)
 
@@ -313,7 +322,7 @@ def delete_visit(visit_id):
     """
     Удаление посещения из базы данных через его идентификатор
     :param visit_id:
-    :return:
+    :return: json-информацию о посещении: статус запроса, код выполнения запроса
     """
     visit = Visit.query.get(visit_id) 
 
@@ -335,7 +344,7 @@ def delete_visit(visit_id):
 def get_all_students():
     """
     Получение полного списка студентов
-    :return:
+    :return: json-информацию о студентах: статус запроса, информацию о каждом студенте, код выполнения запроса
     """
     students_all = Student.query.all()
 
@@ -353,7 +362,7 @@ def get_student_by_id(student_id):
     """
     Получение информации о студенте через его идентификатор
     :param student_id:
-    :return:
+    :return:json-информацию о студенте: статус запроса, информацию о заданном студенте, код выполнения запроса
     """
     student = Student.query.get(student_id)
 
@@ -378,7 +387,10 @@ def get_students_by_group(group_number):
     """
     Получение информации о группе студентов
     :param group_number:
-    :return:
+    :return:json-информацию о студентах:
+        статус запроса,
+        информацию о каждом студенте из группы,
+        код выполнения запроса
     """
     students = Student.query.filter_by(group_number=group_number).first()
 
@@ -403,7 +415,7 @@ def get_students_by_group(group_number):
 def create_student():
     """
     Создание нового студента в базе данных
-    :return:
+    :return: json-информацию о студенте: статус запроса, информацию созданном студенте, код выполнения запроса
     """
     student_data = request.get_json(silent=True)
 
@@ -459,7 +471,7 @@ def edit_student(student_id):
     """
     Редактирование информациии о студенте через его идентификатор
     :param student_id:
-    :return:
+    :return:json-информацию о студенте: статус запроса, новую информацию о студенте, код выполнения запроса
     """
     student = Student.query.get(student_id)
 
@@ -522,7 +534,7 @@ def delete_student(student_id):
     """
     Удаление студента из базы данных через его идентификатор
     :param student_id:
-    :return:
+    :return:json-информацию о студенте: статус запроса, код выполнения запроса
     """
     student = Student.query.get(student_id)
 
