@@ -1,6 +1,8 @@
-from datetime import date, datetime, timedelta
-from sqlalchemy.exc import IntegrityError
+from datetime import datetime, timedelta
+
 from flask import Flask, jsonify, make_response, request
+from sqlalchemy.exc import IntegrityError
+
 from models import db, Student, Visit
 
 app = Flask(__name__)
@@ -316,7 +318,7 @@ def delete_visit(visit_id: int):
     :param visit_id: идентификатор объекта Visit
     :return: если объект найден, сообщает о его удалении, иначе возвращает ошибку
     """
-    visit = Visit.query.get(visit_id) 
+    visit = Visit.query.get(visit_id)
 
     if visit is None:
         status = 'Visit not found'

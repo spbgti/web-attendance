@@ -1,5 +1,6 @@
-from models import Visit, Student
 from datetime import date
+
+from models import Visit, Student
 
 
 def test_visit_to_dict(db):

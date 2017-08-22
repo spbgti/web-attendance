@@ -4,8 +4,8 @@ import pytest
 from flask import Response as BaseResponse
 from flask.testing import FlaskClient
 
-from models import db as _db
 from main import app as _app
+from models import db as _db
 
 
 class Response(BaseResponse):

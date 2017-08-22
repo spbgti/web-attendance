@@ -1,7 +1,8 @@
 from datetime import date
-import json
-from models import Student, Visit
+
 import pytest
+
+from models import Student, Visit
 
 
 class TestBasicAPIVisit:
