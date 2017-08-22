@@ -1,6 +1,6 @@
-import json
-from models import Student
 import pytest
+
+from models import Student
 
 
 class TestBasicAPIStudent:
