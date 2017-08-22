@@ -3,7 +3,7 @@ from models import Student
 
 def test_student_to_dict(db):
     """
-        Проверяет что to_dict у Student работает ожидаемо
+    Проверяет что to_dict у Student работает ожидаемо
     """
     student = Student(name='Ivan', group_number='111')
     student.save()

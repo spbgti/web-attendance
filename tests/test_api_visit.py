@@ -6,7 +6,7 @@ import pytest
 
 class TestBasicAPIVisit:
     """
-        Содержит тесты для объектов с базовым API типа: /object и /object/<object_id>
+        Содержит тесты для объектов с базовым API типа: /visit и /visit/<visit_id>
     """
     def test_get_visit_by_id(self, db, test_client):
         student = Student(name='name', group_number='123')

@@ -14,27 +14,14 @@ class Student(db.Model):
     group_number = db.Column(db.String)
     __table_args__ = (db.UniqueConstraint('name', 'group_number', name='Name_Group_UC'),)
 
-    def __init__(self, name, group_number):
-        """
-        Метод инициализации студента
-        :param name:
-        :param group_number:
-        """
+    def __init__(self, name: str, group_number: str):
         self.name = name
         self.group_number = group_number
 
     def __repr__(self):
-        """
-        Медод выводящий информацию о студенте
-        :return:
-        """
-        return '<Student: %s, %s>' % (self.name, self.group_number)
+       return '<Student: %s, %s>' % (self.name, self.group_number)
 
     def to_dict(self):
-        """
-        Метод возвращающий информацию о студенте ввиде словаря
-        :return:
-        """
         return {
             'id': self.id,
             'name': self.name,
@@ -42,18 +29,10 @@ class Student(db.Model):
         }
 
     def save(self):
-        """
-        Сохранение и закрытие сессии
-        :return:
-        """
         db.session.add(self)
         db.session.commit()
 
     def delete(self):
-        """
-        Удаление и закрытие сессии
-        :return:
-        """
         db.session.delete(self)
         db.session.commit()
 
@@ -69,29 +48,15 @@ class Visit(db.Model):
     student = db.relationship('Student')
     __table_args__ = (db.UniqueConstraint('date', 'pair_num', 'student_id', name='Stud_Date_Pair_UC'),)
 
-    def __init__(self, date, pair_num, student):
-        """
-        Медод инициалицации посещения
-        :param date:
-        :param pair_num:
-        :param student:
-        """
+    def __init__(self, date: date, pair_num: int, student: Student):
         self.date = date
         self.pair_num = pair_num
         self.student = student
 
     def __repr__(self):
-        """
-        Метод, выводящий информацию о посещении
-        :return:
-        """
         return '<Visit: %s, %s, %s>' % (self.student, self.date, self.pair_num)
 
     def to_dict(self):
-        """
-        Метод, возвращающий информацию о посещении ввиде словаря
-        :return:
-        """
         return {
             'id': self.id,
             'date': self.date.strftime('%Y.%m.%d'),
@@ -100,17 +65,9 @@ class Visit(db.Model):
         }
 
     def save(self):
-        """
-        Сохранение и закрытие сессиии
-        :return:
-        """
         db.session.add(self)
         db.session.commit()
 
     def delete(self):
-        """
-        Удаление и закрытие сессии
-        :return:
-        """
         db.session.delete(self)
         db.session.commit()

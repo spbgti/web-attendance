@@ -5,7 +5,7 @@ import pytest
 
 class TestBasicAPIStudent:
     """
-    Содержит тесты для объектов с базовым API типа: /object и /object/<object_id>
+    Содержит тесты для объектов с базовым API типа: /student и /student/<student_id>
     """
     def test_get_student_by_id(self, db, test_client):
         Student(name='name', group_number='123').save()

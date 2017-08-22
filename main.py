@@ -10,11 +10,11 @@ db.init_app(app)
 
 
 @app.route('/visits/<int:visit_id>', methods=['GET'])
-def get_visit_by_id(visit_id):
+def get_visit_by_id(visit_id: int):
     """
-    Получение информации о посещении по его идентефикатору
-    :param visit_id:
-    :return: json-информацию о посещении: статус запроса, детали посещения, код выполнения запроса
+    Ищет соответствующий идентификатору оъект Visit
+    :param visit_id: идентификатор объекта
+    :return: если объект найден, возвращает его json-представление, если не найден - возвращает ошибку
     """
     visit = Visit.query.get(visit_id)
 
@@ -36,8 +36,8 @@ def get_visit_by_id(visit_id):
 @app.route('/visits', methods=['GET'])
 def get_all_visits():
     """
-    Получение информации о всех посещениях в базе данных
-    :return: json-информацию о посещениях: статус запроса, информацию о каждом посещении, код выполнения запроса
+    Возвращает все объекты Visit, сохраненные в базе данных
+    :return: возвращает массив json-представлений каждого объекта
     """
     visits = Visit.query.all()
 
@@ -51,17 +51,12 @@ def get_all_visits():
 
 
 @app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
-def get_visits_by_day(student_id, pair_date):
+def get_visits_by_day(student_id: int, pair_date: str):
     """
-    Полечение информации о посещениях студента за конкретный день
-    :param student_id:
-    :param pair_date:
-    :return:json-информацию о посещении:
-        статус запроса,
-        id студента,
-        дату,
-        информацию о всех парах,
-        код выполнения запроса
+    Ищет студента по student_id и возвращает данный о посещении 4 пар за указанный день
+    :param student_id: идентификатор, связывающий объекты Student и Visit
+    :param pair_date: строка формата YYYY.MM.DD
+    :return: если объект найден, возвращает его json-представление с данными о посещении 4 пар, если не найден - возвращает ошибку
     """
     student = Student.query.get(student_id)
 
@@ -100,16 +95,13 @@ def get_visits_by_day(student_id, pair_date):
 
 
 @app.route('/visits/student/<int:student_id>/week/<week_start>', methods=['GET'])
-def get_visits_by_week(student_id, week_start):
+def get_visits_by_week(student_id: int, week_start: str):
     """
     Получение информации о посещениях студента за неделю(7 дней)
-    :param student_id:
-    :param week_start:
-    :return:json-информацию о посещении:
-        статус запроса,
-        id студента,
-        посещение пар за каждый из 7 дней,
-        код выполнения запроса
+    :param student_id: идентификатор, связывающий объекты Student и Visit
+    :param week_start: строка формата YYYY.MM.DD
+    :return: если объект найден, возвращает json-представление с данными о посещении в 7 дней, начиная с переданного включительно,
+             если не найден - возвращает ошибку
     """
     student = Student.query.get(student_id)
 
@@ -155,8 +147,8 @@ def get_visits_by_week(student_id, week_start):
 @app.route('/visits', methods=['POST'])
 def create_visit():
     """
-    Внесение в базу данных нового посещения
-    :return:json-информацию о посещении: статус запроса, детали созданного посещения, код выполнения запроса
+    Валидирует данный, передаваемые json-ом через POST, создает и сохраняет новый Visit
+    :return: если успешно, возвращает json-представление созданного Visit,  иначе - ошибку
     """
     visit_data = request.get_json(silent=True)
 
@@ -230,11 +222,11 @@ def create_visit():
 
 
 @app.route('/visits/<int:visit_id>', methods=['PUT'])
-def edit_visit(visit_id):
+def edit_visit(visit_id: int):
     """
-    Редактирование информации о посещении, через его идентификатор
-    :param visit_id:
-    :return: json-информацию о посещении: статус запроса, детали измененного посещения, код выполнения запроса
+    Валидирует данный, передаваемые json-ом через POST, обновляет объект Visit, найденный по visit_id базе
+    :param visit_id: идентифкатор объекта Visit
+    :return: если успешно, возвращает json-представление измененного Visit,  иначе - ошибку
     """
     visit = Visit.query.get(visit_id)
 
@@ -318,11 +310,11 @@ def edit_visit(visit_id):
 
 
 @app.route('/visits/<int:visit_id>', methods=['DELETE'])
-def delete_visit(visit_id):
+def delete_visit(visit_id: int):
     """
-    Удаление посещения из базы данных через его идентификатор
-    :param visit_id:
-    :return: json-информацию о посещении: статус запроса, код выполнения запроса
+    Находит объект Visit по visit_id и удаляет его из базы данных
+    :param visit_id: идентификатор объекта Visit
+    :return: если объект найден, сообщает о его удалении, иначе возвращает ошибку
     """
     visit = Visit.query.get(visit_id) 
 
@@ -343,8 +335,8 @@ def delete_visit(visit_id):
 @app.route('/students', methods=['GET'])
 def get_all_students():
     """
-    Получение полного списка студентов
-    :return: json-информацию о студентах: статус запроса, информацию о каждом студенте, код выполнения запроса
+    Возвращает все объекты Student, сохраненные в базе данных
+    :return: массив из json-представлений Student
     """
     students_all = Student.query.all()
 
@@ -358,11 +350,11 @@ def get_all_students():
 
 
 @app.route('/students/<int:student_id>', methods=['GET'])
-def get_student_by_id(student_id):
+def get_student_by_id(student_id: int):
     """
-    Получение информации о студенте через его идентификатор
-    :param student_id:
-    :return:json-информацию о студенте: статус запроса, информацию о заданном студенте, код выполнения запроса
+    Ищет соответсвующий идентификатору объект Student
+    :param student_id: идентификатор объекта Student
+    :return: если объект найден, возвращает его json-представление, если не найден - возвращает ошибку
     """
     student = Student.query.get(student_id)
 
@@ -383,14 +375,11 @@ def get_student_by_id(student_id):
 
 
 @app.route('/students/group/<group_number>', methods=['GET'])
-def get_students_by_group(group_number):
+def get_students_by_group(group_number: int):
     """
-    Получение информации о группе студентов
-    :param group_number:
-    :return:json-информацию о студентах:
-        статус запроса,
-        информацию о каждом студенте из группы,
-        код выполнения запроса
+    Ищет объекты Student по group_number и возвращает даные о них
+    :param group_number: группа, в которой состоят студенты
+    :return: если группа найдена возвращает массив из json-представлений о студентах, иначе - ошибку
     """
     students = Student.query.filter_by(group_number=group_number).first()
 
@@ -414,8 +403,8 @@ def get_students_by_group(group_number):
 @app.route('/students', methods=['POST'])
 def create_student():
     """
-    Создание нового студента в базе данных
-    :return: json-информацию о студенте: статус запроса, информацию созданном студенте, код выполнения запроса
+    Валидирует данные, передаваемые json-ом через POST, создает и сохраняет новый Student
+    :return: если успешно - json-представление созданного Student, иначе - ошибку
     """
     student_data = request.get_json(silent=True)
 
@@ -467,11 +456,11 @@ def create_student():
 
 
 @app.route('/students/<int:student_id>', methods=['PUT'])
-def edit_student(student_id):
+def edit_student(student_id: int):
     """
-    Редактирование информациии о студенте через его идентификатор
-    :param student_id:
-    :return:json-информацию о студенте: статус запроса, новую информацию о студенте, код выполнения запроса
+    Валидирует данные, передаваемые json-ом через POST и обновляет объект Student, найденный по student_id в базе
+    :param student_id: идентификатор объекта Student
+    return: если успешно - json-представление обновленного Student, иначе - ошибку
     """
     student = Student.query.get(student_id)
 
@@ -530,11 +519,11 @@ def edit_student(student_id):
 
 
 @app.route('/students/<int:student_id>', methods=['DELETE'])
-def delete_student(student_id):
+def delete_student(student_id: int):
     """
-    Удаление студента из базы данных через его идентификатор
-    :param student_id:
-    :return:json-информацию о студенте: статус запроса, код выполнения запроса
+    Находит объект Student по student_id и удаляет его из базы данных
+    :param student_id: идентификатор объекта Student
+    :return: если объект найден, сообщает о его удалении, иначе возвращает ошибку
     """
     student = Student.query.get(student_id)
 
@@ -550,6 +539,58 @@ def delete_student(student_id):
         jsonify(status=status),
         status_code
     )
+
+
+@app.route('/student/<student_id>/home')
+def func(student_id:int):
+    return 'SUCCESS'
+
+
+@app.route("/student/login", methods=["GET", "POST"])
+def login():
+    student_data = request.get_json(silent=True)
+
+    if student_data is None:
+        return make_response(
+            jsonify(status="Invalid json"),
+            400
+        )
+
+    try:
+        student_id = student_data['login']
+        password = student_data['password']
+    except KeyError:
+        return make_response(
+            jsonify(status="Requires login and password values"),
+            400
+        )
+
+    if not isinstance(student_id, str):
+        return make_response(
+            jsonify(status="login must be int value"),
+            400
+        )
+
+    if not isinstance(password, str):
+        return make_response(
+            jsonify(status="password must be str value"),
+            400
+        )
+
+    student = Student.query.get(student_id)
+
+    if student is None:
+        return make_response(
+            jsonify(status='Student not found'),
+            404
+        )
+    elif password != '123':
+            return make_response(
+                jsonify(status='Incorrect password'),
+                400
+            )
+    else:
+        func(student_id)
 
 
 if __name__ == '__main__':
