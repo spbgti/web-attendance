@@ -13,7 +13,7 @@ class TestBasicAPIVisit:
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         resp = test_client.get('/visits/1')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             "status": "OK",
             "visit": {
@@ -29,7 +29,7 @@ class TestBasicAPIVisit:
 
     def test_get_non_existent_visit(self, db, test_client):
         resp = test_client.get('/visits/1')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Visit not found'}
         assert data == expected_data
         assert resp.status_code == 404
@@ -43,7 +43,7 @@ class TestBasicAPIVisit:
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         resp = test_client.get('/visits')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             "status": "OK",
             "visits": [
@@ -60,14 +60,13 @@ class TestBasicAPIVisit:
         student.save()
         resp = test_client.post(
             '/visits',
-            data=json.dumps({
+            json={
                 'student_id': 1,
                 'date': '2017.01.01',
                 'pair_num': 1
-            }),
-            content_type='application/json'
+            },
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             'status': 'Created',
             "visit": {
@@ -84,9 +83,8 @@ class TestBasicAPIVisit:
         resp = test_client.post(
             '/visits',
             data='Invalid json',
-            content_type='application/json'
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Invalid json'}
         assert resp.status_code == 400
         assert data == expected_data
@@ -106,10 +104,9 @@ class TestBasicAPIVisit:
         student.save()
         resp = test_client.post(
             '/visits',
-            data=json.dumps(data),
-            content_type='application/json'
+            json=data,
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         assert resp.status_code == status_code
         assert data == expected_data
 
@@ -119,14 +116,13 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017,1,1), pair_num=1).save()
         resp = test_client.post(
             '/visits',
-            data=json.dumps({
+            json={
                 'student_id': 1,
                 'date': '2017.01.01',
                 'pair_num': 1
-            }),
-            content_type='application/json'
+            },
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Found the same visit'}
         assert resp.status_code == 400
         assert data == expected_data
@@ -137,14 +133,14 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps({
+            json={
                 'student_id': 1,
                 'date': '2017.03.01',
                 'pair_num': 1
-            }),
-            content_type='application/json'
+            },
+
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             'status': 'Edited',
             "visit": {
@@ -160,14 +156,13 @@ class TestBasicAPIVisit:
     def test_edit_non_existent_visit(self, db, test_client):
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps({
+            json={
                 'student_id': 1,
                 'date': '2017.03.01',
                 'pair_num': 1
-            }),
-            content_type='application/json'
+            },
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Visit not found'}
         assert resp.status_code == 404
         assert data == expected_data
@@ -179,9 +174,8 @@ class TestBasicAPIVisit:
         resp = test_client.put(
             '/visits/1',
             data='TEXT',
-            content_type='application/json'
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Invalid json'}
         assert resp.status_code == 400
         assert data == expected_data
@@ -202,10 +196,9 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps(data),
-            content_type='application/json'
+            json=data,
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         assert resp.status_code == status_code
         assert data == expected_data
 
@@ -216,14 +209,13 @@ class TestBasicAPIVisit:
         Visit(student=student, date=date(2017, 1, 4), pair_num=2).save()
         resp = test_client.put(
             '/visits/1',
-            data=json.dumps({
+            json={
                 'student_id': 1,
                 'date': '2017.01.04',
                 'pair_num': 2
-            }),
-            content_type='application/json'
+            },
         )
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Found the same visit'}
         assert resp.status_code == 400
         assert data == expected_data
@@ -233,14 +225,14 @@ class TestBasicAPIVisit:
         student.save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         resp = test_client.delete('/visits/1')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Visit is deleted'}
         assert resp.status_code == 200
         assert data == expected_data
 
     def test_delete_non_exsistnt_visit(self, db, test_client):
         resp = test_client.delete('/visits/1')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {'status': 'Visit not found'}
         assert resp.status_code == 404
         assert data == expected_data
@@ -256,7 +248,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=2).save()
         resp = test_client.get('/visits/student/1/date/2017.01.01')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             "status": "OK",
             "visits": {
@@ -279,7 +271,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=2).save()
         resp = test_client.get('/visits/student/2/date/2017.01.01')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {"status": "Student not found"}
         assert data == expected_data
         assert resp.status_code == 404
@@ -290,7 +282,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=2).save()
         resp = test_client.get('/visits/student/1/date/2017')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {"status": "Invalid date format, try YYYY.MM.DD"}
         assert data == expected_data
         assert resp.status_code == 400
@@ -303,7 +295,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 2), pair_num=4).save()
         Visit(student=student, date=date(2017, 1, 3), pair_num=3).save()
         resp = test_client.get('/visits/student/1/week/2017.01.01')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             "status": "OK",
             "visits": {
@@ -363,7 +355,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=2).save()
         resp = test_client.get('/visits/student/2/week/2017.01.01')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {"status": "Student not found"}
         assert data == expected_data
         assert resp.status_code == 404
@@ -374,7 +366,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 1), pair_num=1).save()
         Visit(student=student, date=date(2017, 1, 1), pair_num=2).save()
         resp = test_client.get('/visits/student/1/week/2017')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {"status": "Invalid date format, try YYYY.MM.DD"}
         assert data == expected_data
         assert resp.status_code == 400
@@ -387,7 +379,7 @@ class TestExpandedAPIVisit:
         Visit(student=student, date=date(2017, 1, 2), pair_num=4).save()
         Visit(student=student, date=date(2017, 1, 3), pair_num=3).save()
         resp = test_client.get('/visits/student/1/week/2016.12.30')
-        data = json.loads(resp.data.decode())
+        data = resp.json()
         expected_data = {
             "status": "OK",
             "visits": {
