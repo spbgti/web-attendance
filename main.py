@@ -350,6 +350,31 @@ def get_all_students():
         200
     )
 
+from jinja2 import Template
+import json
+
+data = '' \
+       '{ "response":[{"id":1,"name":"h","group_number":444},' \
+       '{"id":2,"name":"y","group_number":444 },' \
+       '{"id":3,"name":"i","group_number":444}]}' \
+       ''
+data = json.loads(data)
+data = data['response']
+
+text = "" \
+       "<!DOCTYPE html>" \
+       "<html> " \
+            "<head> " \
+                "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' /> " \
+            "</head> " \
+            "<body> " \
+                "{% for elem in data %} /students {{ elem['id'] }} Имя {{elem['name']}} Группа {{elem['group_number']}} {% endfor %}" \
+            "</body>" \
+       "</html>"
+template = Template(text)
+
+print(template.render(data))
+
 
 @app.route('/students/<int:student_id>', methods=['GET'])
 def get_student_by_id(student_id: int):
