@@ -6,8 +6,6 @@ from sqlalchemy.exc import IntegrityError
 from models import db, Student, Visit
 from main import app
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-
 db.init_app(app)
 api = Blueprint('api', __name__, url_prefix='/api/v1')
 
