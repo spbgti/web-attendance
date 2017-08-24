@@ -2,6 +2,7 @@ import pytest
 
 from models import Student
 
+BASE_URL = '/api/v1'
 
 class TestBasicAPIStudent:
     """
@@ -9,7 +10,7 @@ class TestBasicAPIStudent:
     """
     def test_get_student_by_id(self, db, test_client):
         Student(name='name', group_number='123').save()
-        resp = test_client.get('/students/1')
+        resp = test_client.get(BASE_URL + '/students/1')
         data = resp.json()
         expected_data = {'status': 'OK', 'student': {
             'id': 1, 'name': 'name', 'group_number': '123'
@@ -18,7 +19,7 @@ class TestBasicAPIStudent:
         assert data == expected_data
 
     def test_get_non_existent_student(self, db, test_client):
-        resp = test_client.get('/students/1')
+        resp = test_client.get(BASE_URL + '/students/1')
         data = resp.json()
         expected_data = {'status': 'Student not found'}
         assert data == expected_data
@@ -28,7 +29,7 @@ class TestBasicAPIStudent:
         Student(name='name1', group_number='123').save()
         Student(name='name2', group_number='124').save()
         Student(name='name3', group_number='123').save()
-        resp = test_client.get('/students')
+        resp = test_client.get(BASE_URL + '/students')
         data = resp.json()
         expected_data = {
             'status': 'OK',
@@ -43,7 +44,7 @@ class TestBasicAPIStudent:
 
     def test_create_student(self, db, test_client):
         resp = test_client.post(
-            '/students',
+            BASE_URL + '/students',
             json={
                 'name': 'name',
                 'group_number': '123'
@@ -63,7 +64,7 @@ class TestBasicAPIStudent:
 
     def test_create_student_invalid_json(self, db, test_client):
         resp = test_client.post(
-            '/students',
+            BASE_URL + '/students',
             data="invalid json",
         )
         data = resp.json()
@@ -79,7 +80,7 @@ class TestBasicAPIStudent:
     ])
     def test_create_student_wrong_input(self, db, test_client, data, expected_data):
         resp = test_client.post(
-            '/students',
+            BASE_URL + '/students',
             json=data,
         )
         data = resp.json()
@@ -89,7 +90,7 @@ class TestBasicAPIStudent:
     def test_create_student_repeat_data(self, db, test_client):
         Student(name='name', group_number='123').save()
         resp = test_client.post(
-            '/students',
+            BASE_URL + '/students',
             json={
                 'name': 'name',
                 'group_number': '123'
@@ -103,7 +104,7 @@ class TestBasicAPIStudent:
     def test_edit_student(self, db, test_client):
         Student(name='name1', group_number='111').save()
         resp = test_client.put(
-            '/students/1',
+            BASE_URL + '/students/1',
             json={
                 'name': 'name11',
                 'group_number': '123'
@@ -124,7 +125,7 @@ class TestBasicAPIStudent:
     def test_edit_student_invalid_json(self, db, test_client):
         Student(name='name1', group_number='111').save()
         resp = test_client.put(
-            '/students/1',
+            BASE_URL + '/students/1',
             data='TEXT',
         )
         data = resp.json()
@@ -134,7 +135,7 @@ class TestBasicAPIStudent:
 
     def test_edit_student_non_existent_student(self, db, test_client):
         resp = test_client.put(
-            '/students/1',
+            BASE_URL + '/students/1',
             json={
                 'name': 'name11',
                 'group_number': '123'
@@ -155,7 +156,7 @@ class TestBasicAPIStudent:
     def test_edit_student_wrong_input(self, db, test_client, data, expected_data):
         Student(name='name1', group_number='111').save()
         resp = test_client.put(
-            '/students/1',
+            BASE_URL + '/students/1',
             json=data,
         )
         data = resp.json()
@@ -164,14 +165,14 @@ class TestBasicAPIStudent:
 
     def test_delete_student(self, db, test_client):
         Student(name='name1', group_number='111').save()
-        resp = test_client.delete('/students/1')
+        resp = test_client.delete(BASE_URL + '/students/1')
         data = resp.json()
         expected_data = {'status': 'Student is deleted'}
         assert resp.status_code == 200
         assert data == expected_data
 
     def test_delete_non_existent_student(self, db, test_client):
-        resp = test_client.delete('/students/1')
+        resp = test_client.delete(BASE_URL + '/students/1')
         data = resp.json()
         expected_data = {'status': 'Student not found'}
         assert resp.status_code == 404
@@ -187,7 +188,7 @@ class TestExpandedAPIStudent:
         Student(name='name2', group_number='124').save()
         Student(name='name3', group_number='123').save()
         Student(name='name4', group_number='123M').save()
-        resp = test_client.get('/students/group/123')
+        resp = test_client.get(BASE_URL + '/students/group/123')
         data = resp.json()
         expected_data = {
             'status': 'OK',
@@ -200,7 +201,7 @@ class TestExpandedAPIStudent:
         assert resp.status_code == 200
 
     def test_get_non_existent_group(self, db, test_client):
-        resp = test_client.get('/students/group/111')
+        resp = test_client.get(BASE_URL + '/students/group/111')
         data = resp.json()
         expected_data = {'status': 'Group not found'}
         assert data == expected_data
