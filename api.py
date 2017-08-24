@@ -4,13 +4,11 @@ from flask import Flask, jsonify, make_response, request, Blueprint
 from sqlalchemy.exc import IntegrityError
 
 from models import db, Student, Visit
-from main import app
 
-db.init_app(app)
 api = Blueprint('api', __name__, url_prefix='/api/v1')
 
 
-@app.route('/visits/<int:visit_id>', methods=['GET'])
+@api.route('/visits/<int:visit_id>', methods=['GET'])
 def get_visit_by_id(visit_id: int):
     """
     Ищет соответствующий идентификатору оъект Visit
@@ -34,7 +32,7 @@ def get_visit_by_id(visit_id: int):
     )
 
 
-@app.route('/visits', methods=['GET'])
+@api.route('/visits', methods=['GET'])
 def get_all_visits():
     """
     Возвращает все объекты Visit, сохраненные в базе данных
@@ -51,7 +49,7 @@ def get_all_visits():
     )
 
 
-@app.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
+@api.route('/visits/student/<int:student_id>/date/<pair_date>', methods=['GET'])
 def get_visits_by_day(student_id: int, pair_date: str):
     """
     Ищет студента по student_id и возвращает данный о посещении 4 пар за указанный день
@@ -95,7 +93,7 @@ def get_visits_by_day(student_id: int, pair_date: str):
     )
 
 
-@app.route('/visits/student/<int:student_id>/week/<week_start>', methods=['GET'])
+@api.route('/visits/student/<int:student_id>/week/<week_start>', methods=['GET'])
 def get_visits_by_week(student_id: int, week_start: str):
     """
     Получение информации о посещениях студента за неделю(7 дней)
@@ -145,7 +143,7 @@ def get_visits_by_week(student_id: int, week_start: str):
     )
 
 
-@app.route('/visits', methods=['POST'])
+@api.route('/visits', methods=['POST'])
 def create_visit():
     """
     Валидирует данный, передаваемые json-ом через POST, создает и сохраняет новый Visit
@@ -222,7 +220,7 @@ def create_visit():
     )
 
 
-@app.route('/visits/<int:visit_id>', methods=['PUT'])
+@api.route('/visits/<int:visit_id>', methods=['PUT'])
 def edit_visit(visit_id: int):
     """
     Валидирует данный, передаваемые json-ом через POST, обновляет объект Visit, найденный по visit_id базе
@@ -310,7 +308,7 @@ def edit_visit(visit_id: int):
     )
 
 
-@app.route('/visits/<int:visit_id>', methods=['DELETE'])
+@api.route('/visits/<int:visit_id>', methods=['DELETE'])
 def delete_visit(visit_id: int):
     """
     Находит объект Visit по visit_id и удаляет его из базы данных
@@ -333,7 +331,7 @@ def delete_visit(visit_id: int):
     )
 
 
-@app.route('/students', methods=['GET'])
+@api.route('/students', methods=['GET'])
 def get_all_students():
     """
     Возвращает все объекты Student, сохраненные в базе данных
@@ -350,7 +348,7 @@ def get_all_students():
     )
 
 
-@app.route('/students/<int:student_id>', methods=['GET'])
+@api.route('/students/<int:student_id>', methods=['GET'])
 def get_student_by_id(student_id: int):
     """
     Ищет соответсвующий идентификатору объект Student
@@ -375,7 +373,7 @@ def get_student_by_id(student_id: int):
         )
 
 
-@app.route('/students/group/<group_number>', methods=['GET'])
+@api.route('/students/group/<group_number>', methods=['GET'])
 def get_students_by_group(group_number: int):
     """
     Ищет объекты Student по group_number и возвращает даные о них
@@ -401,7 +399,7 @@ def get_students_by_group(group_number: int):
         )
 
 
-@app.route('/students', methods=['POST'])
+@api.route('/students', methods=['POST'])
 def create_student():
     """
     Валидирует данные, передаваемые json-ом через POST, создает и сохраняет новый Student
@@ -456,7 +454,7 @@ def create_student():
     )
 
 
-@app.route('/students/<int:student_id>', methods=['PUT'])
+@api.route('/students/<int:student_id>', methods=['PUT'])
 def edit_student(student_id: int):
     """
     Валидирует данные, передаваемые json-ом через POST и обновляет объект Student, найденный по student_id в базе
@@ -519,7 +517,7 @@ def edit_student(student_id: int):
     )
 
 
-@app.route('/students/<int:student_id>', methods=['DELETE'])
+@api.route('/students/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id: int):
     """
     Находит объект Student по student_id и удаляет его из базы данных
@@ -540,57 +538,3 @@ def delete_student(student_id: int):
         jsonify(status=status),
         status_code
     )
-
-
-@app.route('/student/<student_id>/home')
-def func(student_id:int):
-    return 'SUCCESS'
-
-
-@app.route("/student/login", methods=["GET", "POST"])
-def login():
-    student_data = request.get_json(silent=True)
-
-    if student_data is None:
-        return make_response(
-            jsonify(status="Invalid json"),
-            400
-        )
-
-    try:
-        student_id = student_data['login']
-        password = student_data['password']
-    except KeyError:
-        return make_response(
-            jsonify(status="Requires login and password values"),
-            400
-        )
-
-    if not isinstance(student_id, str):
-        return make_response(
-            jsonify(status="login must be int value"),
-            400
-        )
-
-    if not isinstance(password, str):
-        return make_response(
-            jsonify(status="password must be str value"),
-            400
-        )
-
-    student = Student.query.get(student_id)
-
-    if student is None:
-        return make_response(
-            jsonify(status='Student not found'),
-            404
-        )
-    elif password != '123':
-            return make_response(
-                jsonify(status='Incorrect password'),
-                400
-            )
-    else:
-        func(student_id)
-
-
