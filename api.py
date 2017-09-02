@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from flask import Flask, jsonify, make_response, request, Blueprint
+from flask import jsonify, make_response, request, Blueprint
 from sqlalchemy.exc import IntegrityError
 
 from models import db, Student, Visit
