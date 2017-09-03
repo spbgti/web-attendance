@@ -1,3 +1,4 @@
+from flask_login._compat import text_type
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -17,7 +18,7 @@ class Student(db.Model):
         self.group_number = group_number
 
     def __repr__(self):
-       return '<Student: %s, %s>' % (self.name, self.group_number)
+        return '<Student: %s, %s>' % (self.name, self.group_number)
 
     def to_dict(self):
         return {
@@ -33,6 +34,24 @@ class Student(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        try:
+            return text_type(self.id)
+        except AttributeError:
+            raise NotImplementedError('No `id` attribute - override `get_id`')
 
 
 class Visit(db.Model):
