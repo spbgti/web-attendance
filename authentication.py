@@ -29,14 +29,14 @@ def auth_student():
     else:
         return make_response(
             jsonify(status="auth required"),
-            400
+            401
         )
 
 
 @auth.route('/login/<int:student_id>', methods=['GET'])
 def login_student(student_id: int):
     """
-    Авторизация пользователя
+    Аутентификация пользователя
     :param student_id:
     :return:
     """

@@ -2,7 +2,7 @@ from flask import Flask
 
 from models import db
 from api import api
-from authorization import auth, login_manager
+from authentication import auth, login_manager
 
 app = Flask(__name__)
 app.register_blueprint(api)
