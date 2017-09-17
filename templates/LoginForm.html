@@ -7,14 +7,14 @@
 <body>
     <h1>Sign In</h1>
     <form action="" method="post" name="login">
-        {{form.hidden_tag()}}
+
         <p>
-            ID:<br>
-            {{form.login(size=80)}}<br>
+            ID:
+            <br>{form.login(size=80)}<br>
         </p>
         <p>
-            Password:<br>
-            {{form.password(size=80)}}
+            Password:
+            <br>{form.password(size=80)}
         </p>
         <p><input type="submit" value="Sign In"></p>
     </form>

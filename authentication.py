@@ -40,29 +40,20 @@ def login_student(student_id: int):
     :return:
     """
     form = LoginForm()
-    return render_template('login/<student_id>.html',
-                           title='Sign In',
-                           form=form)
-    good_password = '123'
-    if request.method == "POST":
-        student_id = request.form["login"]
-        password = request.form["password"]
-
     student = Student.query.get(student_id)
-    if student is None:
-        return make_response(
-            jsonify(status="Student not found"),
-            404
-        )
-    elif password == good_password:
-        login_user(student)
-        flash('Logged in successfully.')
-        return redirect(url_for('.auth_student'))
-    else:
-        return make_response(
-            jsonify(status="Wrong password"),
-            400
-        )
+    if form.validate_on_submit():
+        login = request.form["ID"]
+        # password = request.form["Password"]
+        user = Student.query.get(student_id=int(login))
+        if user in None:
+            return render_template('LoginForm.html', form=form)
+        else:
+            login_user(student)
+
+            flash('Logged in successfully.')
+
+            return redirect(url_for('auth_student'))
+    return render_template('LoginForm.html', form=form)
 
 
 @auth.route('/logout', methods=['GET'])
