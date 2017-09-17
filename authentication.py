@@ -36,14 +36,16 @@ def auth_student():
 def login_student():
     """
     Аутентификация пользователя
-    :param student_id:
     :return:
     """
     form = LoginForm()
     good_password = '123'
+    if current_user.is_authenticated:
+        logout_user()
+
     if form.validate_on_submit():
-        login = request.form["login"]
-        password = request.form["password"]
+        login = form.data["login"]
+        password = form.data["password"]
         user = Student.query.get(int(login))
         if (user is None) or (password != good_password):
             return render_template('login_form.html', form=form)
