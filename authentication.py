@@ -32,7 +32,7 @@ def auth_student():
         )
 
 
-@auth.route('/login/<int:student_id>', methods=['GET', 'POST'])
+@auth.route('/login', methods=['GET', 'POST'])
 def login_student(student_id: int):
     """
     Аутентификация пользователя
@@ -40,20 +40,21 @@ def login_student(student_id: int):
     :return:
     """
     form = LoginForm()
+    good_password = '123'
     student = Student.query.get(student_id)
     if form.validate_on_submit():
-        login = request.form["ID"]
-        # password = request.form["Password"]
+        login = request.form["login"]
+        password = request.form["password"]
         user = Student.query.get(student_id=int(login))
-        if user in None:
-            return render_template('LoginForm.html', form=form)
+        if (user in None) or (password != good_password):
+            return render_template('login_form.html', form=form)
         else:
             login_user(student)
 
             flash('Logged in successfully.')
 
             return redirect(url_for('auth_student'))
-    return render_template('LoginForm.html', form=form)
+    return render_template('login_form.html', form=form)
 
 
 @auth.route('/logout', methods=['GET'])
