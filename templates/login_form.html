@@ -8,11 +8,9 @@
     <h1>Sign In</h1>
     <form action="" method="post" name="login">
         {{ form.hidden_tag() }}
-        <p><label for="login">Login: </label><input type="text" id="login"></p>
-        <p><label for="password">Password: </label><input type="password" id="password"></p>
+        <p>{{ form.login.lable }} {{ form.login }}</p>
+        <p>{{ form.password.lable }} {{ form.password }}</p>
         <p><input type="submit" value="Sign In"></p>
     </form>
 </body>
 </html>
-
-<!-- delete -->

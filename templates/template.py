@@ -1,9 +1,7 @@
-from flask_wtf import FlaskForm, validators
-from wtforms import StringField
+from flask_wtf import FlaskForm
+from wtforms import StringField, validators
 
 
 class LoginForm(FlaskForm):
-    login = StringField('login', [validators])
-    password = StringField('password', [validators])
-
-#delete
+    login = StringField('login', [validators.DataRequired()])
+    password = StringField('password', [validators.DataRequired()])
