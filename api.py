@@ -200,16 +200,16 @@ def create_visit():
             400
         )
 
-    visit = Visit(date=pair_date, pair_num=pair_num, student=student)
-    try:
+    visit = Visit.query.filter_by(date=pair_date, pair_num=pair_num, student=student).first()
+
+    if visit is None:
+        visit = Visit(date=pair_date, pair_num=pair_num, student=student)
         visit.save()
         status_code = 201
         status = "Created"
-    except IntegrityError:
-        return make_response(
-            jsonify(status='Found the same visit'),
-            400
-        )
+    else:
+        status_code = 400
+        status = 'Found the same visit'
 
     return make_response(
         jsonify(
@@ -223,7 +223,7 @@ def create_visit():
 @api.route('/visits/<int:visit_id>', methods=['PUT'])
 def edit_visit(visit_id: int):
     """
-    Валидирует данный, передаваемые json-ом через POST, обновляет объект Visit, найденный по visit_id базе
+    Валидирует данный, передаваемые json-ом через PUST, обновляет объект Visit, найденный по visit_id базе
     :param visit_id: идентифкатор объекта Visit
     :return: если успешно, возвращает json-представление измененного Visit,  иначе - ошибку
     """
@@ -286,18 +286,19 @@ def edit_visit(visit_id: int):
             400
         )
 
-    try:
+    new_visit = Visit.query.filter_by(date=pair_date, pair_num=pair_num, student=student).first()
+
+    if new_visit is None:
         visit.student_id = student_id
         visit.date = pair_date
         visit.pair_num = pair_num
-        db.session.commit()
+        visit.save()
         status_code = 200
         status = "Edited"
-    except IntegrityError:
-        return make_response(
-            jsonify(status='Found the same visit'),
-            400
-        )
+    else:
+        visit = new_visit
+        status_code = 400
+        status = 'Found the same visit'
 
     return make_response(
         jsonify(
@@ -434,16 +435,16 @@ def create_student():
             400
         )
 
-    student = Student(name=name, group_number=group_number)
-    try:
+    student = Student.query.filter_by(name=name, group_number=group_number).first()
+
+    if student is None:
+        student = Student(name=name, group_number=group_number)
         student.save()
         status_code = 201
         status = "Created"
-    except IntegrityError:
-        return make_response(
-            jsonify(status='Found same student'),
-            400
-        )
+    else:
+        status_code = 400
+        status = 'Found same student'
 
     return make_response(
         jsonify(
@@ -497,16 +498,19 @@ def edit_student(student_id: int):
             400
         )
 
-    try:
+    new_student = Student.query.filter_by(name=name, group_number=group_number).first()
+
+    if new_student is None:
         student.name = name
         student.group_number = group_number
-        db.session.commit()
+        student.save()
         status_code = 200
         status = 'Edited'
-    except IntegrityError:
-        return make_response(jsonify(
-            status='Found the same student',
-            ), 400)
+
+    else:
+        student = new_student
+        status_code = 400
+        status = 'Found same student'
 
     return make_response(
         jsonify(

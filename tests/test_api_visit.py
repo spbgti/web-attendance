@@ -126,7 +126,15 @@ class TestBasicAPIVisit:
             },
         )
         data = resp.json()
-        expected_data = {'status': 'Found the same visit'}
+        expected_data = {
+            'status': 'Found the same visit',
+            'visit': {
+                'id': 1,
+                'date': '2017.01.01',
+                'pair_num': 1,
+                'student_id': 1
+            }
+        }
         assert resp.status_code == 400
         assert data == expected_data
 
@@ -219,7 +227,15 @@ class TestBasicAPIVisit:
             },
         )
         data = resp.json()
-        expected_data = {'status': 'Found the same visit'}
+        expected_data = {
+            'status': 'Found the same visit',
+            'visit': {
+                'id': 2,
+                'date': '2017.01.04',
+                'pair_num': 2,
+                'student_id': 1
+            }
+        }
         assert resp.status_code == 400
         assert data == expected_data
 

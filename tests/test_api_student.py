@@ -97,7 +97,14 @@ class TestBasicAPIStudent:
             },
         )
         data = resp.json()
-        expected_data = {'status': 'Found same student'}
+        expected_data = {
+            'status': 'Found same student',
+            'student': {
+                'id': 1,
+                'name': 'name',
+                'group_number': '123'
+            }
+        }
         assert resp.status_code == 400
         assert data == expected_data
 
