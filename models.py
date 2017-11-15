@@ -1,17 +1,19 @@
-from datetime import datetime
-
+from flask_login._compat import text_type
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 
 class Student(db.Model):
+    """
+    Модель, хранящая в себе информацию о студенте
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     group_number = db.Column(db.String)
     __table_args__ = (db.UniqueConstraint('name', 'group_number', name='Name_Group_UC'),)
 
-    def __init__(self, name, group_number):
+    def __init__(self, name: str, group_number: str):
         self.name = name
         self.group_number = group_number
 
@@ -33,8 +35,29 @@ class Student(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        try:
+            return text_type(self.id)
+        except AttributeError:
+            raise NotImplementedError('No `id` attribute - override `get_id`')
+
 
 class Visit(db.Model):
+    """
+    Модель, хранящая в себе информацию об одном посещении
+    """
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
     pair_num = db.Column(db.Integer)
@@ -42,7 +65,7 @@ class Visit(db.Model):
     student = db.relationship('Student')
     __table_args__ = (db.UniqueConstraint('date', 'pair_num', 'student_id', name='Stud_Date_Pair_UC'),)
 
-    def __init__(self, date, pair_num, student):
+    def __init__(self, date: date, pair_num: int, student: Student):
         self.date = date
         self.pair_num = pair_num
         self.student = student
